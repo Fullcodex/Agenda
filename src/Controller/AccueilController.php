@@ -14,6 +14,9 @@ use App\Entity\Pj;
 use App\Entity\Categorie;
 use App\Entity\Droit;
 use App\classPerso\DatePerso;
+use DateTime;
+use DateInterval;
+use DatePeriod;
 use function dump;
 
 class AccueilController extends AbstractController {
@@ -59,7 +62,7 @@ class AccueilController extends AbstractController {
                         $query4->setParameter(':Agenda', $selectedAgenda);
                         $allAcces = $query4->getResult();
 
-                        dump($allAcces);
+//                        dump($allAcces);
 
                         break;
                     }
@@ -80,14 +83,19 @@ class AccueilController extends AbstractController {
                     $query4->setParameter(':Agenda', $unAgenda->getAgendas());
                     $allEvents = $query4->getResult();
                 }
-
-//                dump($allEvents);
+            }
+        } else {
+            foreach ($allAgendas as $unAgenda) {
+                $query4 = $bdd->createQuery('SELECT E FROM App\Entity\Evenement E JOIN E.Agenda A WHERE A.id = :Agenda'); //Recherche des droit
+                $query4->setParameter(':Agenda', $unAgenda->getAgendas());
+                $allEvents = $query4->getResult();
             }
         }
 
 //        dump($User);
-        dump($allAgendas);
+//        dump($allAgendas);
 //        dump($unAgenda);
+//        dump($allEvents);
 
 
         if (!empty($uneDate)) {
@@ -100,8 +108,9 @@ class AccueilController extends AbstractController {
                     'allAgendas' => $allAgendas,
                     'allDroits' => $allDroit,
                     'allCategorie' => $allCategorie,
-                    'selectedAgenda' => $selectedAgenda,
                     'allAcces' => $allAcces,
+                    'allEvents' => $allEvents,
+                    'selectedAgenda' => $selectedAgenda,
                     'myAcces' => $myAcces
         ]);
     }
@@ -203,7 +212,6 @@ class AccueilController extends AbstractController {
         $query4->setParameter(':Agenda', $unAgenda);
         $allAcces = $query4->getResult();
 
-        dump($allAcces);
         foreach ($allAcces as $unAcces) {
             if ($unAcces->getAgendas()->getId() == $unAgenda->getId()) {
                 $bdd->remove($unAcces);
@@ -235,23 +243,23 @@ class AccueilController extends AbstractController {
                 $Event->setNote($_POST['inputNote']);
                 $Event->setLieu($_POST['inputLieu']);
                 $Event->setCouleur($_POST['selectCouleur']);
-                $Event->setDateDebut($uneDateEvent->format('Y-m-d ') . $_POST['timeDebut']);
-                $Event->setDateFin($uneDateEvent->format('Y-m-d ') . $_POST['timeFin']);
+                $Event->setDateDebut(date_create($uneDateEvent->format('Y-m-d ') . $_POST['timeDebut']));
+                $Event->setDateFin(date_create($uneDateEvent->format('Y-m-d ') . $_POST['timeFin']));
                 $Event->setAgenda($Agenda);
                 $Event->setCategorie($Categorie);
                 $bdd->persist($Event);
             }
         } else {
             $Event = new Evenement();
-                $Event->setLibelle($_POST['inputLibelle']);
-                $Event->setNote($_POST['inputNote']);
-                $Event->setLieu($_POST['inputLieu']);
-                $Event->setCouleur($_POST['selectCouleur']);
-                $Event->setDateDebut($_POST['dtDebut'] . $_POST['timeDebut']);
-                $Event->setDateFin($_POST['dtDebut'] . $_POST['timeFin']);
-                $Event->setAgenda($Agenda);
-                $Event->setCategorie($Categorie);
-                $bdd->persist($Event);
+            $Event->setLibelle($_POST['inputLibelle']);
+            $Event->setNote($_POST['inputNote']);
+            $Event->setLieu($_POST['inputLieu']);
+            $Event->setCouleur($_POST['selectCouleur']);
+            $Event->setDateDebut(date_create($_POST['dtDebut'] . $_POST['timeDebut']));
+            $Event->setDateFin(date_create($_POST['dtDebut'] . $_POST['timeFin']));
+            $Event->setAgenda($Agenda);
+            $Event->setCategorie($Categorie);
+            $bdd->persist($Event);
         }
 
         $bdd->flush(); //Enregistre les changements dans la bdd
@@ -261,6 +269,15 @@ class AccueilController extends AbstractController {
         }
 
         return $this->redirectToRoute('accueil', ['Date' => $Date]);
+    }
+
+    /**
+     * @Route("/getEventById", name="getEventById")
+     */
+    public function getEventById(): Response {
+        $bdd = $this->getDoctrine()->getManager(); //Recupération de la connexion a la bdd
+        $Event = $bdd->getRepository(Evenement::class)->find($_POST['ref_event']);
+        return  new JsonResponse($Event);
     }
 
 }
