@@ -1,0 +1,46 @@
+{% extends 'naviguation/naviguation.html.twig' %}
+
+{% block title %}Agenda|Accueil{% endblock %}
+
+{% block main %}
+    <style>
+        .tbl-td-calendar{
+            height: 160px;
+        }
+    </style>
+    <table class="table table-bordered">
+        <tr>
+            <th>Lun</th>
+            <th>Mar</th>
+            <th>Mer</th>
+            <th>Jeu</th>
+            <th>Ven</th>
+            <th>Sam</th>
+            <th>Dim</th>
+        </tr>
+
+        {% for day in Date.getDateRage %}
+            {% if day.format('N') == 1 %}
+                <tr>
+                {% endif %}
+                <td class="{#<?= $moisCourant !== $uneDate->format('m') ? 'text-muted' : null ?>#}  tbl-td-calendar" >
+
+                    <div class="row justify-content-between">
+                        <span class="col-auto"> {{ day.format('j') }}</span>
+                        {#                        <span class="col-auto"><button class="btn btn-outline-secondary" data-toggle="modal" data-target="#ModalEvenement" data-whatever="<?= $uneDate->format('Y-m-d') ?>"><i class="fas fa-calendar-day"></i></button></span>#}
+                    </div>
+                    <div style="overflow-y: scroll; max-height: 100px;">
+                        {#                        <?php foreach ($lesEvenements as $unEvent) { ?>#}
+                        {#                        <?php if (date_create($unEvent->DateDebut)->format('Y-m-d') == $uneDate->format('Y-m-d')) { ?>#}
+                        <div>
+                            <button class="btn mt-1" style="background-color: {#<?= $unEvent->Couleur ?>#}; color:black"  data-toggle="modal" data-target="#ModalEvenement" data-whatever="<?= $unEvent->Ref_Evenements ?>">
+                                {#                                <?= $unEvent->Libelle ?>#}
+                            </button>
+                        </div>
+                        {#                        <?php } ?>#}
+                        {#                        <?php } ?>#}
+                    </div>
+                </td>
+            {% endfor %}
+    </table>
+{% endblock %}

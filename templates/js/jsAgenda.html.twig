@@ -1,0 +1,63 @@
+<script>
+    $('#modalAgenda').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); // Button d'eclencheur du modal
+        var recipient = button.data('whatever'); // Recupère l'info de l'attribut whatever
+
+        if (recipient !== undefined) {
+                $('[name="formAgenda"]').attr("action", "{{ path('updateAgenda', {'uneDate':Date.getmoisPre.format('Y-m-d'),'id':selectedAgenda == null ?: selectedAgenda.getId()}) }}"); //Renomage de l'action form
+                $('[name="inputNom"]').val('{{selectedAgenda == null ?: selectedAgenda.getNom()}}');   //Remplis les champs avec la donnée
+                $('[name="oldFile"]').val('{{selectedAgenda == null ?:selectedAgenda.getImg()}}');
+                $('[name="fileImg"]').next().text('{{selectedAgenda == null ?: selectedAgenda.getImg()}}');
+                $('[name="enregistrerAgenda"]').attr("name", "updateAgenda"); //Renomage du bouton d'enregistrement
+                $('[name="updateAgenda"]').val('{{selectedAgenda == null ?: selectedAgenda.getId()}}');
+                $('[name="supprimerAgenda"]').removeAttr('hidden'); //Affiche le bouton supprimer
+                $('[name="supprimerAgenda"]').attr("href", '{{ path('delAgenda', {'uneDate':Date.getmoisPre.format('Y-m-d'),'id':selectedAgenda == null ?: selectedAgenda.getId()}) }}');
+                $('#partagerAgenda').removeAttr('hidden');
+                //Genere le onclick sur le bouton ajouter
+                $('[name="btnShare"]').attr('onclick', 'shareAgenda(' + '{{User.getId()}}' + ',' + '{{selectedAgenda == null ?: selectedAgenda.getId()}}' + ')');
+
+            } else {
+                $('[name="formAgenda"]').attr("action", "{{ path('insertAgenda', {'uneDate':Date.getmoisPre.format('Y-m-d'),'id':User.id}) }}"); //Renomage de l'action form
+                $('[name="inputNom"]').val(""); //Reset input
+                $('[name="fileImg"]').next().text("Choisir une image");
+                $('[name="supprimerAgenda"]').attr('hidden', 'true'); //Cache le bouton supprimer
+                $('[name="supprimerAgenda"]').removeAttr('href'); //Affiche le bouton supprimer
+                $('#partagerAgenda').attr('hidden', 'true');    //Cache le partage de l'agenda
+            }
+        });
+
+        //Creation de la clé et partage de l'agenda
+        function shareAgenda(unExpediteur, unAgenda) {
+            var mailUser = $('[name="inputMailUser"]').val();
+            $.ajax({
+                method: "POST",
+                url: "assets/ajax/getUserByMail.php",
+                dataType: "JSON",
+                data: {mail: mailUser, expediteur: unExpediteur, agenda: unAgenda},
+                success: function (data) {
+                    console.log(data);
+                    if (data === false) {
+                        alert("Aucun utilisateur trouvé.");
+                    } else {
+                        alert("Le mail de partage a été envoyé à " + data.Nom_Personnes + ".");
+                    }
+                }
+            });
+        }
+        ;
+
+        function updateAccess(select, unUser, unAgenda) {
+
+            var unDroit = $(select).val();
+            console.log(unDroit);
+            $.ajax({
+                method: "POST",
+                url: "assets/ajax/updateAccess.php",
+                dataType: "JSON",
+                data: {user: unUser, agenda: unAgenda, droit: unDroit}
+            });
+        }
+        ;
+
+</script>
+

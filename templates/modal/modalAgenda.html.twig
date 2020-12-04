@@ -1,0 +1,65 @@
+<div class="modal fade" id="modalAgenda" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Gestion d'un agenda</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form name="formAgenda" action="{{ path('insertAgenda', {'uneDate':Date.getmoisPre.format('Y-m-d'),'id':User.id}) }}" method="POST" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Nom</label>
+                        <input type="text" class="form-control" name="inputNom">
+                    </div>
+                    <div class="form-group">
+                        <div class="custom-file">
+                            <input type="text" class="custom-file-input" name="oldFile" hidden>
+                            <input type="file" class="custom-file-input" name="fileImg">
+                            <label class="custom-file-label"  data-browse="Parcourir">Choisir une image</label>
+                        </div>
+                    </div>
+                    <div id="partagerAgenda" hidden>
+                        <hr>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Chercher</span>
+                            </div>
+                            <input type="text" class="form-control" name="inputMailUser" placeholder="Mail">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="button" name="btnShare">Ajouter</button>
+                            </div>
+                        </div>
+                        <br>
+                        <table class="table table-sm table-bordered" id="tableUserAcces">
+                            <tr>
+                                <th>Nom</th>
+                                <th>Droit</th>
+                            </tr>
+                            {% for unAcces  in allAcces%}
+                                <tr>
+                                    <td>{{ unAcces.getRefPersonne().getNomPrenom() }}</td>
+                                    {#                                    {{ unAcces.getIdDroit().getLibelle() }}#}
+                                    <td>
+                                        <select class="form-control">
+                                            {% for unDroit  in allDroits %}
+                                                <option {{ unAcces.getIdDroit().getId() == unDroit.getId() ? 'selected' }} value="{{ unDroit.getId() }}">{{ unDroit.getLibelle() }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="submit" name="enregistrerAgenda" class="btn btn-outline-primary">Enregistrer</button>
+                    <a type="button" name="supprimerAgenda" class="btn btn-outline-danger">Supprimer</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

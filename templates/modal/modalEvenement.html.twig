@@ -1,0 +1,214 @@
+
+<div class="modal fade" id="ModalEvenement" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Gestion d'évènement</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{{ path('insertEvent',{'uneDate':Date.getmoisCourant.format('Y-m-d')}) }}" method="POST" id="formEvenement">
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col">
+                            <label>Agenda</label>
+                            <select class="form-control" name="selectAgenda">
+                                <option selected>Choisir</option>
+                                {% for unAgenda in allAgendas %}
+                                    <option value="{{ unAgenda.getAgendas().getId() }}">{{ unAgenda.getAgendas().getNom() }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col ">
+                            <label>Categorie</label>
+                            <select class="form-control" name="selectCategorie">
+                                <option selected>Choisir</option>
+                                {% for uneCategorie in allCategorie %}
+                                    <option value="{{ uneCategorie.getId() }}">{{ uneCategorie.getLibelle() }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col">
+                            <label>Couleur</label>
+                            <select class="form-control" name="selectCouleur">
+                                <option selected>Choisir</option>
+                                <option value="#ff9999" style="background-color: #ff9999">1</option>
+                                <option value="#ffe699" style="background-color: #ffe699">2</option>
+                                <option value="#ffff99" style="background-color: #ffff99">3</option>
+                                <option value="#ccff99" style="background-color: #ccff99">4</option>
+                                <option value="#99ffcc" style="background-color: #99ffcc">5</option>
+                                <option value="#99e6ff" style="background-color: #99e6ff">6</option>
+                                <option value="#9999ff" style="background-color: #9999ff">7</option>
+                                <option value="#cc99ff" style="background-color: #cc99ff">8</option>
+                                <option value="#ff99e6" style="background-color: #ff99e6">9</option>
+                                <option value="#ff99b3" style="background-color: #ff99b3">10</option>
+                            </select>
+                            <!--<input type="color"  class="form-control" >-->
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Libelle</label>
+                        <input type="text" name="inputLibelle" class="form-control" >
+                    </div>
+                    <div class="form-group">
+                        <label>Note</label>
+                        <textarea class="form-control" name="inputNote"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Lieu</label>
+                        <input type="text" class="form-control" name="inputLieu">
+                    </div>
+                    <div class="form-group">
+                        <label>Debut</label>
+                        <div class="input-group">
+                            <input type="date" id="dtDebut" class="form-control" name="dtDebut" require>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col">
+                            <label>Heure de Debut</label>
+                            <input type="time" class="form-control" name="timeDebut" require>
+                        </div>
+                        <div class="col">
+                            <label>Heure de Fin</label>
+                            <input type="time" class="form-control" name="timeFin" require>
+                        </div>
+                    </div>
+                    <hr>
+                    <center>
+                        <div id="checkRecurrence" class="form-group" hidden>
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" name="checkIntervale" class="custom-control-input" id="checkIntervale">
+                                <label class="custom-control-label" for="checkIntervale">Intervalle</label>
+                            </div>
+                        </div>
+                        <a id="btn-collaspeInterval" data-toggle="collapse" href="#collapseInterval" role="button" aria-expanded="false" aria-controls="collapseInterval">
+                            Intervalle
+                        </a>
+                    </center>
+                    <hr>
+                    <div class="form-row collapse" id="collapseInterval">
+                        <div class="form-group col">
+                            <label>Tout les:</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" name="inputRecurrence">
+                                <select class="form-control" name="typeRecurrence">
+                                    <option selected value="">Periode</option>
+                                    <option value="D">Jour</option>
+                                    <option value="W">Semaine</option>
+                                    <option value="M">Mois</option>
+                                    <option value="Y">Année</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group col">
+                            <label>Jusqu'à</label>
+                            <input type="date" class="form-control" name="finRecurrence">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-outline-primary" name="enregistrerEvenement">Enregistrer</button>
+                    <button type="submit" class="btn btn-outline-danger" name="supprimerEvenement" hidden>Supprimer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{#<script>
+
+    //lors de l'ouverture du modal des evenement
+    $('#ModalEvenement').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); // Button d'eclencheur du modal
+        var recipient = button.data('whatever'); // Recupère l'info de l'attribut whatever
+        var pattern = new RegExp(/^\d{4}-\d{2}-\d{2}$/); //Pattern pour tester si c'est une date
+        var bool = pattern.test(recipient); //Teste
+
+        //Si c'est une date
+        if (bool === false) {
+            //Recupère l'evenement a partir de son id
+            $.ajax({
+                method: "POST",
+                url: "assets/ajax/getEvenementById.php",
+                dataType: "JSON",
+                data: {ref_event: recipient, ref_personne: <?= json_encode($_SESSION['user']->Ref_Personnes) ?>},
+                            success: function (data) {
+                                console.log(data);
+                        //Si la données est récupéré
+                        if (data !== false) {
+                            $('[name="selectAgenda"]').val(data.Ref_Agendas);   //Remplis le champ avec la donnée
+                            $('[name="selectCategorie"]').val(data.Ref_Categorie);
+                            $('[name="selectCouleur"]').val(data.Couleur);
+                            $('[name="inputLibelle"]').val(data.Libelle);
+                            $('[name="inputNote"]').val(data.Note);
+                            $('[name="inputLieu"]').val(data.Lieu);
+                            $('[name="dtDebut"]').val(data.DateDebut.split(" ")[0]);
+                            var timeDebut = data.DateDebut.split(" ")[1].split(":")[0] + ":" + data.DateDebut.split(" ")[1].split(":")[1];
+                            $('[name="timeDebut"]').val(timeDebut);
+                            $('[name="dtFin"]').val(data.DateFin.split(" ")[0]);
+                            var timeFin = data.DateFin.split(" ")[1].split(":")[0] + ":" + data.DateFin.split(" ")[1].split(":")[1];
+                            $('[name="timeFin"]').val(timeFin);
+                            $('[name="enregistrerEvenement"]').attr("name", "updateEvenement"); //modification du bouton pour la passer en update
+                            $('[name="updateEvenement"]').val(data.Ref_Evenements); //Met la reference de l'evenement sur le bouton
+                            $('[name="supprimerEvenement"]').removeAttr('hidden'); //Affiche le bouton supprimer
+                            $('[name="supprimerEvenement"]').val(data.Ref_Evenements); //Met la reference de l'evenement sur le bouton
+                            $('#btn-collaspeInterval').attr('hidden', 'true'); //Cache la fonctionnalité d'interval pour l'ajout
+                            $('#checkRecurrence').removeAttr('hidden'); //Affiche le check recurrence
+
+                            //Teste si l'utilisateur a le droits d'ecriture
+                            if (data.Id_Droit_D === "1") {
+                                    $('[name="selectAgenda"]').attr('disabled', ""); //Rend les champs en lecture seule
+                                    $('[name="selectCategorie"]').attr('disabled', "");
+                                    $('[name="selectCouleur"]').attr('disabled', "");
+                                    $('[name="inputLibelle"]').attr('disabled', "");
+                                    $('[name="inputNote"]').attr('disabled', "");
+                                    $('[name="inputLieu"]').attr('disabled', "");
+                                    $('[name="dtDebut"]').attr('disabled', "");
+                                    $('[name="timeDebut"]').attr('disabled', "");
+                                    $('[name="dtFin"]').attr('disabled', "");
+                                    $('[name="timeFin"]').attr('disabled', "");
+                                    $('[name="updateEvenement"]').attr('hidden', ""); //Cache le bouton update
+                                    $('[name="supprimerEvenement"]').attr('hidden', ""); //Cache le bouton supprimer
+                                    $('#checkRecurrence').attr('hidden', 'true');   //Cache le check recurrence
+                                }
+                        }
+                            }
+                            });
+                            } else 
+                        { //Sinon
+
+                                $('[name="selectAgenda"]').removeAttr('disabled');  //On enlève la lecture seule
+                        $('[name="selectCategorie"]').removeAttr('disabled');
+                        $('[name="selectCouleur"]').removeAttr('disabled');
+                        $('[name="inputLibelle"]').removeAttr('disabled');
+                        $('[name="inputNote"]').removeAttr('disabled');
+                        $('[name="inputLieu"]').removeAttr('disabled');
+                        $('[name="dtDebut"]').removeAttr('disabled');
+                        $('[name="timeDebut"]').removeAttr('disabled');
+                        $('[name="dtFin"]').removeAttr('disabled');
+                        $('[name="timeFin"]').removeAttr('disabled');
+
+                        $('[name="selectAgenda"] option:eq(0)').prop('selected', true);    //Mettre les valeurs par default
+                        $('[name="selectCategorie"] option:eq(0)').prop('selected', true);
+                        $('[name="selectCouleur"] option:eq(0)').prop('selected', true);
+                        $('[name="inputLibelle"]').val('');
+                        $('[name="inputNote"]').val('');
+                        $('[name="inputLieu"]').val('');
+                        $('[name="dtDebut"]').val('');
+                        $('[name="timeDebut"]').val('');
+                        $('[name="dtFin"]').val('');
+                        $('[name="timeFin"]').val('');
+
+                        $('#dtDebut').val(recipient);
+                        $('#btn-collaspeInterval').removeAttr('hidden');
+                        $('#checkRecurrence').attr('hidden', 'true');
+                        $('[name="supprimerEvenement"]').attr('hidden', 'true');
+                                    }
+                        
+                                    });
+                                    
+                                
+</script>#}
