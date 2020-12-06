@@ -99,12 +99,12 @@ class Evenement
         return $this->Couleur;
     }
     
-    public function getAgenda(): ?int
+    public function getAgenda(): ?object
     {
         return $this->Agenda;
     }
     
-    public function getCategorie(): ?int
+    public function getCategorie(): ?object
     {
         return $this->Categorie;
     }

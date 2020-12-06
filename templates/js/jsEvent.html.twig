@@ -3,88 +3,99 @@
     $('#ModalEvenement').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget); // Button d'eclencheur du modal
         var recipient = button.data('whatever'); // Recupère l'info de l'attribut whatever
-{#        var pattern = new RegExp(/^\d{4}-\d{2}-\d{2}$/); //Pattern pour tester si c'est une date#}
-{#        var bool = pattern.test(recipient); //Teste#}
-        //Si c'est une date
-        if (recipient !== undefined) {
-            //Recupère l'evenement a partir de son id
-            $.ajax({
-                method: "POST",
-                url: "{{path('getEventById')}}",
-                dataType: "JSON",
-                data: {ref_event: recipient, ref_personne: '{{User.getId()}}'},
-                success: function (data) {
-                    console.log(data);
-                    //Si la données est récupéré
-                    if (data !== false) {
-                        $('[name="selectAgenda"]').val(data.Ref_Agendas);   //Remplis le champ avec la donnée
-                        $('[name="selectCategorie"]').val(data.Ref_Categorie);
-                        $('[name="selectCouleur"]').val(data.Couleur);
-                        $('[name="inputLibelle"]').val(data.Libelle);
-                        $('[name="inputNote"]').val(data.Note);
-                        $('[name="inputLieu"]').val(data.Lieu);
-                        $('[name="dtDebut"]').val(data.DateDebut.split(" ")[0]);
-                        var timeDebut = data.DateDebut.split(" ")[1].split(":")[0] + ":" + data.DateDebut.split(" ")[1].split(":")[1];
-                        $('[name="timeDebut"]').val(timeDebut);
-                        $('[name="dtFin"]').val(data.DateFin.split(" ")[0]);
-                        var timeFin = data.DateFin.split(" ")[1].split(":")[0] + ":" + data.DateFin.split(" ")[1].split(":")[1];
-                        $('[name="timeFin"]').val(timeFin);
-                        $('[name="enregistrerEvenement"]').attr("name", "updateEvenement"); //modification du bouton pour la passer en update
-                        $('[name="updateEvenement"]').val(data.Ref_Evenements); //Met la reference de l'evenement sur le bouton
-                        $('[name="supprimerEvenement"]').removeAttr('hidden'); //Affiche le bouton supprimer
-                        $('[name="supprimerEvenement"]').val(data.Ref_Evenements); //Met la reference de l'evenement sur le bouton
-                        $('#btn-collaspeInterval').attr('hidden', 'true'); //Cache la fonctionnalité d'interval pour l'ajout
-                        $('#checkRecurrence').removeAttr('hidden'); //Affiche le check recurrence
+    {#        var pattern = new RegExp(/^\d{4}-\d{2}-\d{2}$/); //Pattern pour tester si c'est une date#}
+    {#        var bool = pattern.test(recipient); //Teste#}
+            //Si c'est une date
+            if (recipient !== undefined) {
+                id_event = recipient.split('|')[0];
+                id_agenda = recipient.split('|')[1];
+                //Recupère l'evenement a partir de son id
+                $.ajax({
+                    method: "POST",
+                    url: "{{path('getEventById')}}",
+                    dataType: "JSON",
+                    data: {ref_event: id_event, ref_agenda: id_agenda, ref_personne: '{{User.getId()}}'},
+                    success: function (data) {
+{#                        console.log(data);#}
+                        //Si la données est récupéré
+                        if (data !== false) {
+                            $('[name="selectAgendaForm"]').val(data.Ref_Agendas);   //Remplis le champ avec la donnée
+                            $('[name="selectCategorie"]').val(data.Ref_Categorie);
+                            $('[name="selectCouleur"]').val(data.Couleur);
+                            $('[name="inputLibelle"]').val(data.Libelle);
+                            $('[name="inputNote"]').val(data.Note);
+                            $('[name="inputLieu"]').val(data.Lieu);
+                            $('[name="dtDebut"]').val(data.DateDebut.split(" ")[0]);
+                            var timeDebut = data.DateDebut.split(" ")[1].split(":")[0] + ":" + data.DateDebut.split(" ")[1].split(":")[1];
+                            $('[name="timeDebut"]').val(timeDebut);
+                            $('[name="dtFin"]').val(data.DateFin.split(" ")[0]);
+                            var timeFin = data.DateFin.split(" ")[1].split(":")[0] + ":" + data.DateFin.split(" ")[1].split(":")[1];
+                            $('[name="timeFin"]').val(timeFin);
+                            $('[name="enregistrerEvenement"]').attr("name", "updateEvenement"); //modification du bouton pour la passer en update
+                            $('[name="updateEvenement"]').val(data.Ref_Evenements); //Met la reference de l'evenement sur le bouton
+                            $('[name="supprimerEvenement"]').removeAttr('hidden'); //Affiche le bouton supprimer
+                            $('[name="supprimerEvenement"]').val(data.Ref_Evenements); //Met la reference de l'evenement sur le bouton
+                            $('#btn-collaspeInterval').attr('hidden', 'true'); //Cache la fonctionnalité d'interval pour l'ajout
+                            $('#checkRecurrence').removeAttr('hidden'); //Affiche le check recurrence
+                            $('[name="checkIntervale"]').prop( "checked", false );
+                            $('[name="formEvenement"]').attr("action", "{{ path('updateEvent', {'uneDate':Date.getmoisPre.format('Y-m-d')}) }}");
 
-                        //Teste si l'utilisateur a le droits d'ecriture
-                        if (data.Id_Droit_D === "1") {
-                            $('[name="selectAgenda"]').attr('disabled', ""); //Rend les champs en lecture seule
-                            $('[name="selectCategorie"]').attr('disabled', "");
-                            $('[name="selectCouleur"]').attr('disabled', "");
-                            $('[name="inputLibelle"]').attr('disabled', "");
-                            $('[name="inputNote"]').attr('disabled', "");
-                            $('[name="inputLieu"]').attr('disabled', "");
-                            $('[name="dtDebut"]').attr('disabled', "");
-                            $('[name="timeDebut"]').attr('disabled', "");
-                            $('[name="dtFin"]').attr('disabled', "");
-                            $('[name="timeFin"]').attr('disabled', "");
-                            $('[name="updateEvenement"]').attr('hidden', ""); //Cache le bouton update
-                            $('[name="supprimerEvenement"]').attr('hidden', ""); //Cache le bouton supprimer
-                            $('#checkRecurrence').attr('hidden', 'true');   //Cache le check recurrence
+                            //Teste si l'utilisateur a le droits d'ecriture
+                            if (data.Id_Droit_D === 0) {
+                                $('[name="selectAgendaForm"]').attr('disabled', ""); //Rend les champs en lecture seule
+                                $('[name="selectCategorie"]').attr('disabled', "");
+                                $('[name="selectCouleur"]').attr('disabled', "");
+                                $('[name="inputLibelle"]').attr('disabled', "");
+                                $('[name="inputNote"]').attr('disabled', "");
+                                $('[name="inputLieu"]').attr('disabled', "");
+                                $('[name="dtDebut"]').attr('disabled', "");
+                                $('[name="timeDebut"]').attr('disabled', "");
+                                $('[name="dtFin"]').attr('disabled', "");
+                                $('[name="timeFin"]').attr('disabled', "");
+                                $('[name="updateEvenement"]').attr('hidden', ""); //Cache le bouton update
+                                $('[name="supprimerEvenement"]').attr('hidden', ""); //Cache le bouton supprimer
+                                $('#checkRecurrence').attr('hidden', 'true');   //Cache le check recurrence
+                            }
                         }
                     }
-                }
-            });
-        } else { //Sinon
+                });
+            } else { //Sinon
 
-            $('[name="selectAgenda"]').removeAttr('disabled');  //On enlève la lecture seule
-            $('[name="selectCategorie"]').removeAttr('disabled');
-            $('[name="selectCouleur"]').removeAttr('disabled');
-            $('[name="inputLibelle"]').removeAttr('disabled');
-            $('[name="inputNote"]').removeAttr('disabled');
-            $('[name="inputLieu"]').removeAttr('disabled');
-            $('[name="dtDebut"]').removeAttr('disabled');
-            $('[name="timeDebut"]').removeAttr('disabled');
-            $('[name="dtFin"]').removeAttr('disabled');
-            $('[name="timeFin"]').removeAttr('disabled');
+                $('[name="selectAgendaForm"]').removeAttr('disabled');  //On enlève la lecture seule
+                $('[name="selectCategorie"]').removeAttr('disabled');
+                $('[name="selectCouleur"]').removeAttr('disabled');
+                $('[name="inputLibelle"]').removeAttr('disabled');
+                $('[name="inputNote"]').removeAttr('disabled');
+                $('[name="inputLieu"]').removeAttr('disabled');
+                $('[name="dtDebut"]').removeAttr('disabled');
+                $('[name="timeDebut"]').removeAttr('disabled');
+                $('[name="dtFin"]').removeAttr('disabled');
+                $('[name="timeFin"]').removeAttr('disabled');
 
-            $('[name="selectAgenda"] option:eq(0)').prop('selected', true);    //Mettre les valeurs par default
-            $('[name="selectCategorie"] option:eq(0)').prop('selected', true);
-            $('[name="selectCouleur"] option:eq(0)').prop('selected', true);
-            $('[name="inputLibelle"]').val('');
-            $('[name="inputNote"]').val('');
-            $('[name="inputLieu"]').val('');
-            $('[name="dtDebut"]').val('');
-            $('[name="timeDebut"]').val('');
-            $('[name="dtFin"]').val('');
-            $('[name="timeFin"]').val('');
+                {#$('[name="selectAgendaForm"] option:eq(0)').prop('selected', true);    //Mettre les valeurs par default
+                $('[name="selectCategorie"] option:eq(0)').prop('selected', true);
+                $('[name="selectCouleur"] option:eq(0)').prop('selected', true);
+                $('[name="inputLibelle"]').val('');
+                $('[name="inputNote"]').val('');
+                $('[name="inputLieu"]').val('');
+                $('[name="dtDebut"]').val('');
+                $('[name="timeDebut"]').val('');
+                $('[name="dtFin"]').val('');
+                $('[name="timeFin"]').val('');#}
+                
+                document.getElementById('formEvenement').reset();
+                            
+                $('#btn-collaspeInterval').removeAttr('hidden');
+                $('#checkRecurrence').attr('hidden', 'true');
+                $('[name="checkIntervale"]').prop( "checked", false );
+                $('[name="supprimerEvenement"]').attr('hidden', 'true');
+            }
+        });
 
-            $('#dtDebut').val(recipient);
-            $('#btn-collaspeInterval').removeAttr('hidden');
-            $('#checkRecurrence').attr('hidden', 'true');
-            $('[name="supprimerEvenement"]').attr('hidden', 'true');
+        function delEvent() {
+            $('[name="formEvenement"]').attr("action", "{{ path('delEvent', {'uneDate':Date.getmoisPre.format('Y-m-d')}) }}");
+            $('[name="formEvenement"]').submit();
         }
-    });
 
-    
+
 </script>

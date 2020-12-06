@@ -29,14 +29,16 @@
                         <span class="col-auto"> {{ day.format('j') }}</span>                     
                     </div>
                     <div style="overflow-y: scroll; max-height: 100px;">
-                        {% for unEvent in allEvents %}
-                            {% if unEvent.getDateDebut().format('Y-m-d') ==  day.format('Y-m-d') %}
-                                <div>
-                                    <button class="btn mt-1" style="background-color: {{ unEvent.getCouleur() }}; color:black"  data-toggle="modal" data-target="#ModalEvenement" data-whatever="{{ unEvent.getId() }}">
-                                        {{ unEvent.getLibelle() }}
-                                    </button>
-                                </div>
-                            {% endif %}
+                        {% for unAgenda in allEvents %}
+                            {% for unEvent in unAgenda %}
+                                {% if unEvent.getDateDebut().format('Y-m-d') ==  day.format('Y-m-d') %}
+                                    <div>
+                                        <button class="btn mt-1" style="background-color: {{ unEvent.getCouleur() }}; color:black"  data-toggle="modal" data-target="#ModalEvenement" data-whatever="{{ unEvent.getId()~'|'~unEvent.getAgenda().getId() }}">
+                                            {{ unEvent.getLibelle() }}
+                                        </button>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
                         {% endfor %}
 
                     </div>

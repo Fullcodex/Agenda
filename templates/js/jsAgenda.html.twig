@@ -31,33 +31,38 @@
             var mailUser = $('[name="inputMailUser"]').val();
             $.ajax({
                 method: "POST",
-                url: "assets/ajax/getUserByMail.php",
+                url: "{{path('shareAgenda')}}",
                 dataType: "JSON",
                 data: {mail: mailUser, expediteur: unExpediteur, agenda: unAgenda},
                 success: function (data) {
-                    console.log(data);
-                    if (data === false) {
+{#                    console.log(data);#}
+                    if (data === undefined) {
                         alert("Aucun utilisateur trouvé.");
                     } else {
                         alert("Le mail de partage a été envoyé à " + data.Nom_Personnes + ".");
                     }
                 }
             });
-        }
-        ;
+        };
+        
 
         function updateAccess(select, unUser, unAgenda) {
 
             var unDroit = $(select).val();
-            console.log(unDroit);
+            {#console.log(unDroit);
+            console.log(unUser);
+            console.log(unAgenda);#}
             $.ajax({
                 method: "POST",
-                url: "assets/ajax/updateAccess.php",
+                url: "{{path('updateAccesAgenda', {'uneDate':Date.getmoisPre.format('Y-m-d')})}}",
                 dataType: "JSON",
-                data: {user: unUser, agenda: unAgenda, droit: unDroit}
+                data: {user: unUser, agenda: unAgenda, droit: unDroit},
+                success: function (data) {
+{#                    console.log(data);#}
+                    alert(data.msg);
+                }
             });
-        }
-        ;
+        };
 
 </script>
 

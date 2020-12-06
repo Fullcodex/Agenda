@@ -8,13 +8,13 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action="{{ path('insertEvent',{'uneDate':Date.getmoisCourant.format('Y-m-d')}) }}" method="POST" id="formEvenement">
+            <form action="{{ path('insertEvent',{'uneDate':Date.getmoisCourant.format('Y-m-d')}) }}" method="POST" id='formEvenement' name="formEvenement">
                 <div class="modal-body">
                     <div class="form-row">
                         <div class="form-group col">
                             <label>Agenda</label>
-                            <select class="form-control" name="selectAgenda" require>
-                                <option selected>Choisir</option>
+                            <select class="form-control" name="selectAgendaForm" required>
+                                <option disabled selected>Choisir</option>
                                 {% for unAgenda in allAgendas %}
                                     <option value="{{ unAgenda.getAgendas().getId() }}">{{ unAgenda.getAgendas().getNom() }}</option>
                                 {% endfor %}
@@ -22,8 +22,8 @@
                         </div>
                         <div class="form-group col ">
                             <label>Categorie</label>
-                            <select class="form-control" name="selectCategorie">
-                                <option selected>Choisir</option>
+                            <select class="form-control" name="selectCategorie" required>
+                                <option disabled selected>Choisir</option>
                                 {% for uneCategorie in allCategorie %}
                                     <option value="{{ uneCategorie.getId() }}">{{ uneCategorie.getLibelle() }}</option>
                                 {% endfor %}
@@ -31,8 +31,8 @@
                         </div>
                         <div class="form-group col">
                             <label>Couleur</label>
-                            <select class="form-control" name="selectCouleur">
-                                <option selected>Choisir</option>
+                            <select class="form-control" name="selectCouleur" required>
+                                <option disabled selected>Choisir</option>
                                 <option value="#ff9999" style="background-color: #ff9999">1</option>
                                 <option value="#ffe699" style="background-color: #ffe699">2</option>
                                 <option value="#ffff99" style="background-color: #ffff99">3</option>
@@ -49,7 +49,7 @@
                     </div>
                     <div class="form-group">
                         <label>Libelle</label>
-                        <input type="text" name="inputLibelle" class="form-control" >
+                        <input type="text" name="inputLibelle" class="form-control" required>
                     </div>
                     <div class="form-group">
                         <label>Note</label>
@@ -62,17 +62,17 @@
                     <div class="form-group">
                         <label>Debut</label>
                         <div class="input-group">
-                            <input type="date" id="dtDebut" class="form-control" name="dtDebut" require>
+                            <input type="date" id="dtDebut" class="form-control" name="dtDebut" required>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="col">
                             <label>Heure de Debut</label>
-                            <input type="time" class="form-control" name="timeDebut" require>
+                            <input type="time" class="form-control" name="timeDebut" required>
                         </div>
                         <div class="col">
                             <label>Heure de Fin</label>
-                            <input type="time" class="form-control" name="timeFin" require>
+                            <input type="time" class="form-control" name="timeFin" required>
                         </div>
                     </div>
                     <hr>
@@ -111,7 +111,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Fermer</button>
                     <button type="submit" class="btn btn-outline-primary" name="enregistrerEvenement">Enregistrer</button>
-                    <button type="submit" class="btn btn-outline-danger" name="supprimerEvenement" hidden>Supprimer</button>
+                    <button onclick="delEvent();" class="btn btn-outline-danger" name="supprimerEvenement" hidden>Supprimer</button>
                 </div>
             </form>
         </div>
