@@ -66,7 +66,7 @@ class Personne implements UserInterface {
     public function getDateNaissance(): ?object {
         if (!empty($this->Date_Naissance)) {
             return $this->Date_Naissance;
-        }else{
+        } else {
             return null;
         }
     }
@@ -105,6 +105,10 @@ class Personne implements UserInterface {
         $roles = $this->roles;
         // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
+
+        if ($this->id == 1) {
+            $roles[] = 'ROLE_ADMIN';
+        }
 
         return array_unique($roles);
     }
