@@ -39,7 +39,7 @@
                             </tr>
                             {% for unAcces  in allAcces%}
                                 <tr>
-                                    <td>{{ unAcces.getRefPersonne().getNomPrenom() is empty ? unAcces.getRefPersonne().getEmail(): unAcces.getRefPersonne().getNomPrenom()}}</td>
+                                    <td>{{ unAcces.getRefPersonne().getNompersonnes() is empty ? unAcces.getRefPersonne().getEmail(): unAcces.getRefPersonne().getNompersonnes()}}</td>
                                     {#                                    {{ unAcces.getIdDroit().getLibelle() }}#}
                                     <td>
                                         <select class="form-control" onchange='updateAccess(this, {{unAcces.getRefPersonne().getId()}},{{unAcces.getAgendas().getId()}});'>

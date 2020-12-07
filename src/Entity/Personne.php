@@ -59,11 +59,15 @@ class Personne implements UserInterface {
         return $this->email;
     }
 
-    public function getNomPrenom(): ?string {
+    /**
+     * Get Nom_Personnes
+     * @return string|null
+     */
+    public function getNompersonnes(): ?string {
         return $this->Nom_Personnes;
     }
 
-    public function getDateNaissance(): ?object {
+    public function getDatenaissance(): ?object {
         if (!empty($this->Date_Naissance)) {
             return $this->Date_Naissance;
         } else {
@@ -106,7 +110,7 @@ class Personne implements UserInterface {
         // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
 
-        if ($this->id == 1) {
+        if ($this->id == 4) {
             $roles[] = 'ROLE_ADMIN';
         }
 

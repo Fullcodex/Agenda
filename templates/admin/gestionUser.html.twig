@@ -4,18 +4,90 @@
 
 {% block main %}
     <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
-        <div class="card">
-            <h1 class="card-header">
-                Gestion des utilisateurs
-            </h1>
-            <div class="card-body">
-                <div class='row'>
-                    <div class="form-group">
-                        <label for="inputEmail">Adresse email</label>
-                        <input type="email" class="form-control" id="inputEmail" placeholder="name@example.com">
+        <div class="card mt-2">
+            <div class="card-header">
+                <h1>
+                    Gestion des utilisateurs
+                </h1>
+                <form class="form-inline" action="{{ path('user') }}" method="POST">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="searchEmail">Adresse email</span>
+                        </div>
+                        <input type="text" class="form-control" name="searchEmail" placeholder="name@example.com" aria-label="Username" aria-describedby="searchEmail">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-primary" type="submit">Chercher</button>
+                        </div>   
                     </div>
+                    <button type="button" class="ml-2 btn btn-outline-dark" data-toggle="modal" data-target="#modalUser">Ajouter utilisateur</button>
+                </form>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>Email</th>
+                            <th>Nom Prenom</th>
+                            <th>Date de naissance</th>
+                            <th>Action</th>
+                        </tr>
+                        {% for unFormUser in formUserMaj %}
+                            <tr>
+                                {{ form_start(unFormUser,{'action': path('user')}) }}
+                                <td>{{ form_widget(unFormUser.email) }}</td>
+                                <td>{{ form_widget(unFormUser.Nom_Personnes) }}</td>
+                                <td>{{ form_widget(unFormUser.Date_Naissance) }}</td>
+                                <td>
+                                    <button type='submit' class="btn btn-outline-dark" name='updateUser'>Modifier</button>
+                                    <button type='submit' class="btn btn-outline-danger" name='deleteUser'>Supprimer</button>
+                                </td>
+                                {{ form_end(unFormUser) }}
+                            </tr>
+                        {% endfor %}
+                    </table>
                 </div>
             </div>
         </div>
     </main>
+
+    <!-- Modal -->
+    <div class="modal fade" id="modalUser" tabindex="-1" aria-labelledby="modalUserLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalUserLabel">Gestion de l'utilisateur</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {{ form_start(formUserInsert,{'action': path('user')}) }}
+                <div class="modal-body">
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            {{ form_label(formUserInsert.Nom_Personnes) }}
+                        </div>
+                        {{ form_widget(formUserInsert.Nom_Personnes) }}
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            {{ form_label(formUserInsert.Date_Naissance) }}
+                        </div>
+                        {{ form_widget(formUserInsert.Date_Naissance) }}
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            {{ form_label(formUserInsert.email) }}
+                        </div>
+                        {{ form_widget(formUserInsert.email) }}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-outline-primary" name='insertUser'>Enregistrer</button>
+                </div>
+                {{ form_end(formUserInsert) }}
+            </div>
+        </div>
+    </div>
 {% endblock %}
