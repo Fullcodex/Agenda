@@ -55,6 +55,12 @@ class Acceder
         return $this->Id_Droit;
     }
     
+    public function setId($id): ?self {
+        $this->id = $id;
+
+        return $this;
+    }
+    
      public function setRefPersonne($Ref_Personne): ?self
     {
          $this->Ref_Personne = $Ref_Personne;

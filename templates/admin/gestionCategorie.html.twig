@@ -1,0 +1,66 @@
+{% extends 'admin/navigation.html.twig' %}
+
+{% block title %}Agenda|Administration{% endblock %}
+
+{% block main %}
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+        <div class="card mt-2">
+            <div class="card-header">
+                <h1>
+                    Gestion des catégories
+                </h1>
+                <button type="button" class="ml-auto btn btn-outline-dark" data-toggle="modal" data-target="#modalCategorie">Ajouter une catégorie</button>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>Libelle</th>
+                            <th>Actions</th>
+                        </tr>
+                        {% for unFormCategorie in formCategorieMaj %}
+                            <tr>
+                                {{ form_start(unFormCategorie,{'action': path('categorie')}) }}
+                                <td>{{ form_widget(unFormCategorie.Libelle) }}</td>
+                                <td>
+                                    <button type='submit' class="btn btn-outline-dark" name='updateCategorie'>Modifier</button>
+                                    <button type='submit' class="btn btn-outline-danger" name='deleteCategorie'>Supprimer</button>
+                                </td>
+                                {{ form_end(unFormCategorie) }}
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal -->
+    <div class="modal fade" id="modalCategorie" tabindex="-1" aria-labelledby="modalCategorieLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalCategorieLabel">Insertion d'une catégorie</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {{ form_start(formCategorieInsert, {'action': path('categorie')})}}
+                <div class="modal-body">
+                    {{ form_widget(formCategorieInsert.id)}}
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            {{ form_label(formCategorieInsert.Libelle)}}
+                        </div>
+                        {{ form_widget(formCategorieInsert.Libelle)}}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-outline-primary" name='insertCategorie'>Enregistrer</button>
+                </div>
+                {{ form_end(formCategorieInsert)}}
+            </div>
+        </div>
+    </div>
+{% endblock %}

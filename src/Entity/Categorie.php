@@ -31,4 +31,16 @@ class Categorie
     {
         return $this->Libelle;
     }
+    
+    public function setId($id): ?self
+    {
+        $this->id = $id;
+        return $this;
+    }
+    
+    public function setLibelle($libelle): ?self
+    {
+        $this->Libelle = $libelle;
+        return $this;
+    }
 }

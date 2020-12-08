@@ -1,0 +1,103 @@
+{% extends 'admin/navigation.html.twig' %}
+
+{% block title %}Agenda|Administration{% endblock %}
+
+{% block main %}
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+        <div class="card mt-2">
+            <div class="card-header">
+                <h1>
+                    Gestion des accès
+                </h1>
+                <form class="form-inline" action="{{ path('acces') }}" method="POST">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="searchEmail">Adresse email</span>
+                        </div>
+                        <input type="text" class="form-control" name="searchEmail" placeholder="name@example.com" aria-describedby="searchEmail">
+                    </div>
+
+                    <div class="input-group ml-2">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text">Options</label>
+                        </div>
+                        <select class="custom-select" name="searchAgenda">
+                            <option selected>Choisir</option>
+                            {% for unAgenda in AllAgenda %}
+                                <option value="{{ unAgenda.getId() }}">{{ unAgenda.getNom() }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button class="btn btn-outline-primary ml-2" type="submit">Chercher</button>
+                    <button type="button" class="ml-auto btn btn-outline-dark" data-toggle="modal" data-target="#modalAcces">Ajouter un acces</button>
+                </form>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>Personne</th>
+                            <th>Agenda</th>
+                            <th>Droit</th>
+                            <th>Action</th>
+                        </tr>
+                        {% for unFormAcces in formAccesMaj %}
+                            <tr>
+                                {{ form_start(unFormAcces,{'action': path('acces')}) }}
+                                <td>{{ form_widget(unFormAcces.Ref_Personne) }}</td>
+                                <td>{{ form_widget(unFormAcces.Agendas) }}</td>
+                                <td>{{ form_widget(unFormAcces.Id_Droit) }}</td>
+                                <td>
+                                    <button type='submit' class="btn btn-outline-dark" name='updateAcces'>Modifier</button>
+                                    <button type='submit' class="btn btn-outline-danger" name='deleteAcces'>Supprimer</button>
+                                </td>
+                                {{ form_end(unFormAcces) }}
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal -->
+    <div class="modal fade" id="modalAcces" tabindex="-1" aria-labelledby="modalAccesLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalAccesLabel">Insertion d'un accès</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {{ form_start(formAccesInsert, {'action': path('acces')})}}
+                <div class="modal-body">
+                    {{ form_widget(formAccesInsert.id)}}
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            {{ form_label(formAccesInsert.Ref_Personne)}}
+                        </div>
+                        {{ form_widget(formAccesInsert.Ref_Personne)}}
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            {{ form_label(formAccesInsert.Agendas)}}
+                        </div>
+                        {{ form_widget(formAccesInsert.Agendas)}}
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            {{ form_label(formAccesInsert.Id_Droit)}}
+                        </div>
+                        {{ form_widget(formAccesInsert.Id_Droit)}}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-outline-primary" name='insertAcces'>Enregistrer</button>
+                </div>
+                {{ form_end(formAccesInsert)}}
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,222 @@
+{% extends 'admin/navigation.html.twig' %}
+
+{% block title %}Agenda|Administration{% endblock %}
+
+{% block main %}
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+        <div class="card mt-2">
+            <div class="card-header">
+                <h1>
+                    Gestion des accès
+                </h1>
+                <form class="form-inline" action="{{ path('evenement') }}" method="POST">
+                    <div class="input-group ml-2">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text">Agenda</label>
+                        </div>
+                        <select class="custom-select" name="searchAgenda">
+                            <option selected>Choisir</option>
+                            {% for unAgenda in AllAgendaFilter %}
+                                <option value="{{ unAgenda.getId() }}">{{ unAgenda.getNom() }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button class="btn btn-outline-primary ml-2" type="submit">Chercher</button>
+                    <button type="button" class="ml-auto btn btn-outline-dark" data-toggle="modal" data-target="#modalEvenement">Ajouter des évènements</button>
+                </form>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>Libelle</th>
+                            <th>Note</th>
+                            <th>Lieu</th>
+                            <th>Date de début</th>
+                            <th>Heur de debut</th>
+                            <th>Heur de fin</th>
+                            <th>Couleur</th>
+                            <th>Agenda</th>
+                            <th>Categorie</th>
+                            <th>Intervalle</th>
+                            <th>Action</th>
+                        </tr>
+                        {% for unEvent in AllEvenement %}
+                            <form action='{{ path('evenement') }}' method='POST'>
+                                <tr>
+                                    <td><input type="text" name="inputLibelle" class="form-control" value='{{ unEvent.getLibelle() }}' required></td>
+                                    <td><textarea class="form-control" name="inputNote">{{ unEvent.getNote() }}</textarea></td>
+                                    <td><input type="text" class="form-control" name="inputLieu" value='{{ unEvent.getlieu() }}'></td>
+                                    <td><input type="date" id="dtDebut" class="form-control" name="dtDebut" value='{{ unEvent.getDateDebut().format('Y-m-d') }}' required></td>
+                                    <td><input type="time" class="form-control" name="timeDebut" value='{{ unEvent.getDateDebut().format('H:i') }}' required></td>
+                                    <td><input type="time" class="form-control" name="timeFin" value='{{ unEvent.getDateFin().format('H:i') }}' required></td>
+                                    <td>
+                                        <div class="form-group col">
+                                            <select class="form-control" name="selectCouleur" required>
+                                                <option disabled selected>Choisir</option>
+                                                <option {{ unEvent.getCouleur() == '#ff9999' ? 'selected'}} value="#ff9999" style="background-color: #ff9999">1</option>
+                                                <option {{ unEvent.getCouleur() == '#ffe699' ? 'selected'}} value="#ffe699" style="background-color: #ffe699">2</option>
+                                                <option {{ unEvent.getCouleur() == '#ffff99' ? 'selected'}} value="#ffff99" style="background-color: #ffff99">3</option>
+                                                <option {{ unEvent.getCouleur() == '#ccff99' ? 'selected'}} value="#ccff99" style="background-color: #ccff99">4</option>
+                                                <option {{ unEvent.getCouleur() == '#99ffcc' ? 'selected'}} value="#99ffcc" style="background-color: #99ffcc">5</option>
+                                                <option {{ unEvent.getCouleur() == '#99e6ff' ? 'selected'}} value="#99e6ff" style="background-color: #99e6ff">6</option>
+                                                <option {{ unEvent.getCouleur() == '#9999ff' ? 'selected'}} value="#9999ff" style="background-color: #9999ff">7</option>
+                                                <option {{ unEvent.getCouleur() == '#cc99ff' ? 'selected'}} value="#cc99ff" style="background-color: #cc99ff">8</option>
+                                                <option {{ unEvent.getCouleur() == '#ff99e6' ? 'selected'}} value="#ff99e6" style="background-color: #ff99e6">9</option>
+                                                <option {{ unEvent.getCouleur() == '#ff99b3' ? 'selected'}} value="#ff99b3" style="background-color: #ff99b3">10</option>
+                                            </select>
+                                            <!--<input type="color"  class="form-control" >-->
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <select class="form-control" name="selectAgendaForm" required>
+                                            <option disabled selected>Choisir</option>
+                                            {% for unAgenda in AllAgendaFilter %}
+                                                <option {{ unEvent.getAgenda().getId() == unAgenda.getId() ?'selected'  }} value="{{ unAgenda.getId() }}">{{ unAgenda.getNom() }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="form-control" name="selectCategorie" required>
+                                            <option disabled selected>Choisir</option>
+                                            {% for uneCategorie in AllCategorie %}
+                                                <option {{ unEvent.getCategorie().getId() == uneCategorie.getId() ?'selected'  }} value="{{ uneCategorie.getId() }}">{{ uneCategorie.getLibelle() }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="checkbox" name="checkIntervale" id="checkIntervale">
+                                    </td>
+                                    <td>
+                                        <button type='submit' class="btn btn-outline-dark" name='updateEvenement' value='{{ unEvent.getId() }}'>Modifier</button>
+                                        <button type='submit' class="btn btn-outline-danger" name='deleteEvenement' value='{{ unEvent.getId() }}'>Supprimer</button>
+                                    </td>
+                                </tr>
+                            </form>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal -->
+    <div class="modal fade" id="modalEvenement" tabindex="-1" aria-labelledby="modalEvenementLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEvenementLabel">Insertion des evenement</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <form action='{{ path('evenement') }}' method='POST'>
+                    <div class="modal-body">
+                        <div class="form-row">
+                            <div class="form-group col">
+                                <label>Agenda</label>
+                                <select class="form-control" name="selectAgendaForm" required>
+                                    <option disabled selected>Choisir</option>
+                                    {% for unAgenda in AllAgendaFilter %}
+                                        <option value="{{ unAgenda.getId() }}">{{ unAgenda.getNom() }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group col ">
+                                <label>Categorie</label>
+                                <select class="form-control" name="selectCategorie" required>
+                                    <option disabled selected>Choisir</option>
+                                    {% for uneCategorie in AllCategorie %}
+                                        <option value="{{ uneCategorie.getId() }}">{{ uneCategorie.getLibelle() }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group col">
+                                <label>Couleur</label>
+                                <select class="form-control" name="selectCouleur" required>
+                                    <option disabled selected>Choisir</option>
+                                    <option value="#ff9999" style="background-color: #ff9999">1</option>
+                                    <option value="#ffe699" style="background-color: #ffe699">2</option>
+                                    <option value="#ffff99" style="background-color: #ffff99">3</option>
+                                    <option value="#ccff99" style="background-color: #ccff99">4</option>
+                                    <option value="#99ffcc" style="background-color: #99ffcc">5</option>
+                                    <option value="#99e6ff" style="background-color: #99e6ff">6</option>
+                                    <option value="#9999ff" style="background-color: #9999ff">7</option>
+                                    <option value="#cc99ff" style="background-color: #cc99ff">8</option>
+                                    <option value="#ff99e6" style="background-color: #ff99e6">9</option>
+                                    <option value="#ff99b3" style="background-color: #ff99b3">10</option>
+                                </select>
+                                <!--<input type="color"  class="form-control" >-->
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Libelle</label>
+                            <input type="text" name="inputLibelle" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Note</label>
+                            <textarea class="form-control" name="inputNote"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Lieu</label>
+                            <input type="text" class="form-control" name="inputLieu">
+                        </div>
+                        <div class="form-group">
+                            <label>Debut</label>
+                            <div class="input-group">
+                                <input type="date" id="dtDebut" class="form-control" name="dtDebut" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col">
+                                <label>Heure de Debut</label>
+                                <input type="time" class="form-control" name="timeDebut" required>
+                            </div>
+                            <div class="col">
+                                <label>Heure de Fin</label>
+                                <input type="time" class="form-control" name="timeFin" required>
+                            </div>
+                        </div>
+                        <hr>
+                        <center>
+                            <div id="checkRecurrence" class="form-group" hidden>
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" name="checkIntervale" class="custom-control-input" id="checkIntervale">
+                                    <label class="custom-control-label" for="checkIntervale">Intervalle</label>
+                                </div>
+                            </div>
+                            <a id="btn-collaspeInterval" data-toggle="collapse" href="#collapseInterval" role="button" aria-expanded="false" aria-controls="collapseInterval">
+                                Intervalle
+                            </a>
+                        </center>
+                        <hr>
+                        <div class="form-row collapse" id="collapseInterval">
+                            <div class="form-group col">
+                                <label>Tout les:</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" name="inputRecurrence">
+                                    <select class="form-control" name="typeRecurrence">
+                                        <option selected value="">Periode</option>
+                                        <option value="D">Jour</option>
+                                        <option value="W">Semaine</option>
+                                        <option value="M">Mois</option>
+                                        <option value="Y">Année</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col">
+                                <label>Jusqu'à</label>
+                                <input type="date" class="form-control" name="finRecurrence">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Fermer</button>
+                        <button type="submit" class="btn btn-outline-primary" name="enregistrerEvenement">Enregistrer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

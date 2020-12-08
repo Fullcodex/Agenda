@@ -31,6 +31,7 @@ class AccueilController extends AbstractController {
 
         $selectedAgenda = null;
         $allAcces = array();
+        $allEvents = array();
         $myAcces = false;
 
 //Connexion base de donnée
@@ -128,9 +129,9 @@ class AccueilController extends AbstractController {
             $Date->majDate($uneDate);
         }
 
-        $User->setNomPrenom($_POST['inputNomUser']);
+        $User->setNompersonnes($_POST['inputNomUser']);
         $User->setEmail($_POST['inputEmailUser']);
-        $User->setDateNaissance($_POST['inputDtNaissUser']);
+        $User->setDatenaissance(date_create($_POST['inputDtNaissUser']));
 
         if (!empty($_POST['inputPwd1']) && !empty($_POST['inputPwd2'])) {
             if ($_POST['inputPwd1'] == $_POST['inputPwd2']) {
@@ -245,7 +246,6 @@ class AccueilController extends AbstractController {
 
             if (!empty($Receveur)) {
                 if (empty($Agenda->getCle()) || ($Agenda->getDtCle()->add($Interval) >= date_create())) {
-//                    $Agenda->genClePartage(array($_POST['agenda']));
                     $Agenda->setCle(uniqid($Agenda->getId()));
                     $Agenda->setDtCle(date_create());
                     $bdd->persist($Agenda);

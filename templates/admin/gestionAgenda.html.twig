@@ -1,0 +1,101 @@
+{% extends 'admin/navigation.html.twig' %}
+
+{% block title %}Agenda|Administration{% endblock %}
+
+{% block main %}
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+        <div class="card mt-2">
+            <div class="card-header">
+                <h1>
+                    Gestion des accès
+                </h1>
+                <form class="form-inline" action="{{ path('agenda') }}" method="POST">
+                    <div class="input-group ml-2">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text">Agenda</label>
+                        </div>
+                        <select class="custom-select" name="searchAgenda">
+                            <option selected>Choisir</option>
+                            {% for unAgenda in AllAgendaFilter %}
+                                <option value="{{ unAgenda.getId() }}">{{ unAgenda.getNom() }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button class="btn btn-outline-primary ml-2" type="submit">Chercher</button>
+                    <button type="button" class="ml-auto btn btn-outline-dark" data-toggle="modal" data-target="#modalAgenda">Ajouter un agenda</button>
+                </form>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>Nom</th>
+                            <th>Cle</th>
+                            <th>Date clé</th>
+                            <th>Action</th>
+                        </tr>
+                        {% for unFormAgenda in formAgendaMaj %}
+                            <tr>
+                                {{ form_start(unFormAgenda,{'action': path('agenda')}) }}
+                                <td>{{ form_widget(unFormAgenda.Nom) }}</td>
+                                <td>{{ form_widget(unFormAgenda.Cle) }}</td>
+                                <td>{{ form_widget(unFormAgenda.Dt_Cle) }}</td>
+                                <td>
+                                    <button type='submit' class="btn btn-outline-warning" name='generateKeyAgenda'>Générer une clé</button>
+                                    <button type='submit' class="btn btn-outline-dark" name='updateAgenda'>Modifier</button>
+                                    <button type='submit' class="btn btn-outline-danger" name='deleteAgenda'>Supprimer</button>
+                                </td>
+                                {{ form_end(unFormAgenda) }}
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+            <div class='card-footer'>
+                Pour confirmer l'accès au partage d'un agenda veuillez remplacer les mots entre croisillons et entrer cette url ci-dessous dans une barre de recherche<br>
+                http://localhost:8000/confirmeAgenda/#idPersonne#/#Cle#
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal -->
+    <div class="modal fade" id="modalAgenda" tabindex="-1" aria-labelledby="modalAgendaLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalAgendaLabel">Insertion d'un agenda</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {{ form_start(formAgendaInsert, {'action': path('agenda')})}}
+                <div class="modal-body">
+                    {{ form_widget(formAgendaInsert.id)}}
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            {{ form_label(formAgendaInsert.Nom)}}
+                        </div>
+                        {{ form_widget(formAgendaInsert.Nom)}}
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            {{ form_label(formAgendaInsert.Cle)}}
+                        </div>
+                        {{ form_widget(formAgendaInsert.Cle)}}
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            {{ form_label(formAgendaInsert.Dt_Cle)}}
+                        </div>
+                        {{ form_widget(formAgendaInsert.Dt_Cle)}}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-outline-primary" name='insertAgenda'>Enregistrer</button>
+                </div>
+                {{ form_end(formAgendaInsert)}}
+            </div>
+        </div>
+    </div>
+{% endblock %}

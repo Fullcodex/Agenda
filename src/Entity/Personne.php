@@ -54,6 +54,12 @@ class Personne implements UserInterface {
     public function getId(): ?int {
         return $this->id;
     }
+    
+    public function setId(int $id): ?self {
+         $this->id = $id;
+         
+         return $this;
+    }
 
     public function getEmail(): ?string {
         return $this->email;
@@ -81,15 +87,13 @@ class Personne implements UserInterface {
         return $this;
     }
 
-    public function setNomPrenom(string $NomPrenom): self {
+    public function setNompersonnes(string $NomPrenom): self {
         $this->Nom_Personnes = $NomPrenom;
         return $this;
     }
 
-    public function setDateNaissance(string $Date_Naissance): self {
-        if (!empty($Date_Naissance)) {
-            $this->Date_Naissance = date_create($Date_Naissance);
-        }
+    public function setDatenaissance(object $Date_Naissance): self {
+        $this->Date_Naissance = $Date_Naissance;
         return $this;
     }
 

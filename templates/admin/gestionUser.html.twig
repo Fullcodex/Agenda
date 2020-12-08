@@ -19,7 +19,7 @@
                             <button class="btn btn-outline-primary" type="submit">Chercher</button>
                         </div>   
                     </div>
-                    <button type="button" class="ml-2 btn btn-outline-dark" data-toggle="modal" data-target="#modalUser">Ajouter utilisateur</button>
+{#                    <button type="button" class="ml-2 btn btn-outline-dark" data-toggle="modal" data-target="#modalUser">Ajouter utilisateur</button>#}
                 </form>
             </div>
             <div class="card-body">
@@ -29,6 +29,7 @@
                             <th>Email</th>
                             <th>Nom Prenom</th>
                             <th>Date de naissance</th>
+{#                            <th>Mots de passe</th>#}
                             <th>Action</th>
                         </tr>
                         {% for unFormUser in formUserMaj %}
@@ -37,6 +38,7 @@
                                 <td>{{ form_widget(unFormUser.email) }}</td>
                                 <td>{{ form_widget(unFormUser.Nom_Personnes) }}</td>
                                 <td>{{ form_widget(unFormUser.Date_Naissance) }}</td>
+{#                                <td>{{ form_widget(unFormUser.password) }}</td>#}
                                 <td>
                                     <button type='submit' class="btn btn-outline-dark" name='updateUser'>Modifier</button>
                                     <button type='submit' class="btn btn-outline-danger" name='deleteUser'>Supprimer</button>
@@ -81,6 +83,12 @@
                         </div>
                         {{ form_widget(formUserInsert.email) }}
                     </div>
+                    {#<div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            {{ form_label(formUserInsert.password) }}
+                        </div>
+                        {{ form_widget(formUserInsert.password) }}
+                    </div>#}
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Fermer</button>
