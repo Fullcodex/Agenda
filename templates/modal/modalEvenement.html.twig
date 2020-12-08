@@ -1,9 +1,9 @@
 
 <div class="modal fade" id="ModalEvenement" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog" role="Gestion des évènement">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Gestion d'évènement</h5>
+                <div class="h5 modal-title">Gestion d'évènement</div>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -12,8 +12,8 @@
                 <div class="modal-body">
                     <div class="form-row">
                         <div class="form-group col">
-                            <label>Agenda</label>
-                            <select class="form-control" name="selectAgendaForm" required>
+                            <label for="selectAgendaForm">Agenda</label>
+                            <select id="selectAgendaForm" class="form-control" name="selectAgendaForm" required>
                                 <option disabled selected>Choisir</option>
                                 {% for unAgenda in allAgendas %}
                                     <option value="{{ unAgenda.getAgendas().getId() }}">{{ unAgenda.getAgendas().getNom() }}</option>
@@ -21,8 +21,8 @@
                             </select>
                         </div>
                         <div class="form-group col ">
-                            <label>Categorie</label>
-                            <select class="form-control" name="selectCategorie" required>
+                            <label for="selectCategorie">Categorie</label>
+                            <select id="selectCategorie" class="form-control" name="selectCategorie" required>
                                 <option disabled selected>Choisir</option>
                                 {% for uneCategorie in allCategorie %}
                                     <option value="{{ uneCategorie.getId() }}">{{ uneCategorie.getLibelle() }}</option>
@@ -30,8 +30,8 @@
                             </select>
                         </div>
                         <div class="form-group col">
-                            <label>Couleur</label>
-                            <select class="form-control" name="selectCouleur" required>
+                            <label for="selectCouleur">Couleur</label>
+                            <select id="selectCouleur" class="form-control" name="selectCouleur" required>
                                 <option disabled selected>Choisir</option>
                                 <option value="#ff9999" style="background-color: #ff9999">1</option>
                                 <option value="#ffe699" style="background-color: #ffe699">2</option>
@@ -48,31 +48,31 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Libelle</label>
-                        <input type="text" name="inputLibelle" class="form-control" required>
+                        <label for="inputLibelle">Libelle</label>
+                        <input id="inputLibelle" type="text" name="inputLibelle" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label>Note</label>
-                        <textarea class="form-control" name="inputNote"></textarea>
+                        <label for="inputNote">Note</label>
+                        <textarea id="inputNote" class="form-control" name="inputNote"></textarea>
                     </div>
                     <div class="form-group">
-                        <label>Lieu</label>
-                        <input type="text" class="form-control" name="inputLieu">
+                        <label for="inputLieu">Lieu</label>
+                        <input id="inputLieu" type="text" class="form-control" name="inputLieu">
                     </div>
                     <div class="form-group">
-                        <label>Debut</label>
+                        <label for="dtDebut">Debut</label>
                         <div class="input-group">
-                            <input type="date" id="dtDebut" class="form-control" name="dtDebut" required>
+                            <input id="dtDebut" type="date" id="dtDebut" class="form-control" name="dtDebut" required>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="col">
-                            <label>Heure de Debut</label>
-                            <input type="time" class="form-control" name="timeDebut" required>
+                            <label for="timeDebut">Heure de Debut</label>
+                            <input id="timeDebut" type="time" class="form-control" name="timeDebut" required>
                         </div>
                         <div class="col">
-                            <label>Heure de Fin</label>
-                            <input type="time" class="form-control" name="timeFin" required>
+                            <label for="timeFin">Heure de Fin</label>
+                            <input id="timeFin" type="time" class="form-control" name="timeFin" required>
                         </div>
                     </div>
                     <hr>
@@ -90,10 +90,15 @@
                     <hr>
                     <div class="form-row collapse" id="collapseInterval">
                         <div class="form-group col">
-                            <label>Tout les:</label>
+                            <label for="inputRecurrence">Tout les:</label>
                             <div class="input-group">
-                                <input type="number" class="form-control" name="inputRecurrence">
-                                <select class="form-control" name="typeRecurrence">
+                                <input id="inputRecurrence" type="number" class="form-control" name="inputRecurrence">
+                            </div>
+                        </div>
+                        <div class="form-group col">
+                            <label for="typeRecurrence">Periode:</label>
+                            <div class="input-group">
+                                <select id="typeRecurrence" class="form-control" name="typeRecurrence">
                                     <option selected value="">Periode</option>
                                     <option value="D">Jour</option>
                                     <option value="W">Semaine</option>
@@ -103,8 +108,8 @@
                             </div>
                         </div>
                         <div class="form-group col">
-                            <label>Jusqu'à</label>
-                            <input type="date" class="form-control" name="finRecurrence">
+                            <label for="finRecurrence">Jusqu'à</label>
+                            <input id="finRecurrence" type="date" class="form-control" name="finRecurrence">
                         </div>
                     </div>
                 </div>

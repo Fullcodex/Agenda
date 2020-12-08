@@ -3,9 +3,7 @@
     $('#ModalEvenement').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget); // Button d'eclencheur du modal
         var recipient = button.data('whatever'); // Recupère l'info de l'attribut whatever
-    {#        var pattern = new RegExp(/^\d{4}-\d{2}-\d{2}$/); //Pattern pour tester si c'est une date#}
-    {#        var bool = pattern.test(recipient); //Teste#}
-            //Si c'est une date
+            //Si c'est l'id event et l'id agenda
             if (recipient !== undefined) {
                 id_event = recipient.split('|')[0];
                 id_agenda = recipient.split('|')[1];
@@ -16,7 +14,6 @@
                     dataType: "JSON",
                     data: {ref_event: id_event, ref_agenda: id_agenda, ref_personne: '{{User.getId()}}'},
                     success: function (data) {
-{#                        console.log(data);#}
                         //Si la données est récupéré
                         if (data !== false) {
                             $('[name="selectAgendaForm"]').val(data.Ref_Agendas);   //Remplis le champ avec la donnée
@@ -71,17 +68,6 @@
                 $('[name="timeDebut"]').removeAttr('disabled');
                 $('[name="dtFin"]').removeAttr('disabled');
                 $('[name="timeFin"]').removeAttr('disabled');
-
-                {#$('[name="selectAgendaForm"] option:eq(0)').prop('selected', true);    //Mettre les valeurs par default
-                $('[name="selectCategorie"] option:eq(0)').prop('selected', true);
-                $('[name="selectCouleur"] option:eq(0)').prop('selected', true);
-                $('[name="inputLibelle"]').val('');
-                $('[name="inputNote"]').val('');
-                $('[name="inputLieu"]').val('');
-                $('[name="dtDebut"]').val('');
-                $('[name="timeDebut"]').val('');
-                $('[name="dtFin"]').val('');
-                $('[name="timeFin"]').val('');#}
                 
                 document.getElementById('formEvenement').reset();
                             

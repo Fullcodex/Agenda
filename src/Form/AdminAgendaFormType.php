@@ -11,7 +11,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 
-
+/**
+ * Class création du formulaire d'agenda admin
+ */
 class AdminAgendaFormType extends AbstractType {
 
     public function buildForm(FormBuilderInterface $builder, array $options) {
@@ -23,7 +25,7 @@ class AdminAgendaFormType extends AbstractType {
                             'label_attr' => ['hidden' => 'true']])
                 ->add('Nom', TextType::class,
                         [
-                            'attr'       => ['class' => 'form-control'],
+                            'attr'       => ['class' => 'form-control'], 
                             'label_attr' => ['class' => 'input-group-text']])
                 ->add('Cle', TextType::class,
                         [
@@ -34,7 +36,6 @@ class AdminAgendaFormType extends AbstractType {
                             'widget'     => 'single_text',
                             'attr'       => ['class' => 'form-control', 'disabled' => true],
                             'label_attr' => ['class' => 'input-group-text']])
-//            ->add('Img')
         ;
     }
 

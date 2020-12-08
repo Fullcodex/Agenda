@@ -27,12 +27,17 @@ class DatePerso {
     }
 
     public function majDate($date) {
-        $this->dtDebut = date_create('first day of ' . $date)->modify('monday this week');
-        $this->dtFin = date_create('last day of ' . $date)->modify('sunday this week')->add($this->interval);
-        $this->dateRage = new DatePeriod($this->dtDebut, $this->interval, $this->dtFin);
-        $this->moisPre = date_create('first day of ' . $date)->modify('last month');
-        $this->moisSui = date_create('first day of ' . $date)->modify('next month');
-        $this->moisCourant = date_create('first day of ' . $date);
+        if(preg_match('/\d{4}-\d{2}-\d{2}/',$date)) {
+            $infosDate = explode('-', $date);
+            if (checkdate($infosDate[1], $infosDate[2], $infosDate[0])) {
+                $this->dtDebut = date_create('first day of ' . $date)->modify('monday this week');
+                $this->dtFin = date_create('last day of ' . $date)->modify('sunday this week')->add($this->interval);
+                $this->dateRage = new DatePeriod($this->dtDebut, $this->interval, $this->dtFin);
+                $this->moisPre = date_create('first day of ' . $date)->modify('last month');
+                $this->moisSui = date_create('first day of ' . $date)->modify('next month');
+                $this->moisCourant = date_create('first day of ' . $date);
+            }
+        }
     }
 
     public function tradFr() {
@@ -51,28 +56,32 @@ class DatePerso {
             'November'  => 'Novembre',
             'December'  => 'Décembre'
         );
-        
+
         return $monthFr[$this->moisCourant->format('F')];
     }
-    
-    public function getdtDebut(){
+
+    public function getdtDebut() {
         return $this->dtDebut;
     }
-    
-    public function getdtFin(){
+
+    public function getdtFin() {
         return $this->dtFin;
     }
-    
-    public function getDateRage(){
+
+    public function getDateRage() {
         return $this->dateRage;
     }
-    public function getmoisPre(){
+
+    public function getmoisPre() {
         return $this->moisPre;
     }
-    public function getmoisSui(){
+
+    public function getmoisSui() {
         return $this->moisSui;
     }
-    public function getmoisCourant(){
+
+    public function getmoisCourant() {
         return $this->moisCourant;
     }
+
 }

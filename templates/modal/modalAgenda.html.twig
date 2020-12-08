@@ -1,8 +1,8 @@
 <div class="modal fade" id="modalAgenda" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog" role="Gestion des agendas">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Gestion d'un agenda</h5>
+                <div class="h5 modal-title">Gestion d'un agenda</div>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -10,23 +10,28 @@
             <form name="formAgenda" action="{{ path('insertAgenda', {'uneDate':Date.getmoisPre.format('Y-m-d'),'id':User.id}) }}" method="POST" enctype="multipart/form-data">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>Nom</label>
-                        <input type="text" class="form-control" name="inputNom">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="spanNom">Nom</span>
+                            </div>
+                            <input aria-describedby="spanNom" aria-label="Nom Agenda" type="text" class="form-control" name="inputNom">
+                        </div>
                     </div>
                     <div class="form-group">
                         <div class="custom-file">
-                            <input type="text" class="custom-file-input" name="oldFile" hidden>
-                            <input type="file" class="custom-file-input" name="fileImg">
-                            <label class="custom-file-label"  data-browse="Parcourir">Choisir une image</label>
+                            <input id="oldFile" type="text" class="custom-file-input" name="oldFile" hidden>
+                            <label for="oldFile" class="custom-file-label"  data-browse="Parcourir" hidden>Choisir une image</label>
+                            <input id="fileImg" type="file" class="custom-file-input" name="fileImg">
+                            <label for="fileImg" class="custom-file-label"  data-browse="Parcourir">Choisir une image</label>
                         </div>
                     </div>
                     <div id="partagerAgenda" hidden>
                         <hr>
                         <div class="input-group">
                             <div class="input-group-prepend">
-                                <span class="input-group-text">Chercher</span>
+                                <label for="inputMailUser" class="input-group-text">Chercher</label>
                             </div>
-                            <input type="text" class="form-control" name="inputMailUser" placeholder="Mail">
+                            <input id="inputMailUser" type="text" class="form-control" name="inputMailUser" placeholder="Mail">
                             <div class="input-group-append">
                                 <button class="btn btn-outline-secondary" type="button" name="btnShare">Ajouter</button>
                             </div>
@@ -38,16 +43,18 @@
                                 <th>Droit</th>
                             </tr>
                             {% for unAcces  in allAcces%}
-                                <tr>
+                                <tr id="tr{{unAcces.getRefPersonne().getId()}}">
                                     <td>{{ unAcces.getRefPersonne().getNompersonnes() is empty ? unAcces.getRefPersonne().getEmail(): unAcces.getRefPersonne().getNompersonnes()}}</td>
                                     {#                                    {{ unAcces.getIdDroit().getLibelle() }}#}
                                     <td>
-                                        <select class="form-control" onchange='updateAccess(this, {{unAcces.getRefPersonne().getId()}},{{unAcces.getAgendas().getId()}});'>
+                                        <label for="selectAcces" class="input-group-text" hidden>Acces:</label>
+                                        <select id="selectAcces" class="form-control" onchange='updateAccess(this, {{unAcces.getRefPersonne().getId()}},{{unAcces.getAgendas().getId()}} );'>
                                             {% for unDroit  in allDroits %}
                                                 <option {{ unAcces.getIdDroit().getId() == unDroit.getId() ? 'selected' }} value="{{ unDroit.getId() }}">{{ unDroit.getLibelle() }}</option>
                                             {% endfor %}
                                         </select>
                                     </td>
+                                    <td><button type="button" class="btn btn-outline-danger" onclick='deleteAccess({{unAcces.getRefPersonne().getId()}},{{unAcces.getAgendas().getId()}} );'>Supprimer</button></td>
                                 </tr>
                             {% endfor %}
                         </table>

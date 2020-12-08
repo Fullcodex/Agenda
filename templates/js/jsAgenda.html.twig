@@ -63,6 +63,20 @@
                 }
             });
         };
+        
+        function deleteAccess(unUser, unAgenda) {
+
+            $.ajax({
+                method: "POST",
+                url: "{{path('deleteAccesAgenda', {'uneDate':Date.getmoisPre.format('Y-m-d')})}}",
+                dataType: "JSON",
+                data: {user: unUser, agenda: unAgenda},
+                success: function (data) {
+                    alert(data.msg);
+                    $('#tr'+unUser).remove();
+                }
+            });
+        };
 
 </script>
 

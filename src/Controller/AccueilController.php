@@ -8,6 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Security\LoginFormAuthenticator;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Swift_Mailer;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use App\Entity\Personne;
 use App\Entity\Acceder;
 use App\Entity\Agenda;
@@ -21,6 +22,10 @@ use DateInterval;
 use DatePeriod;
 use function dump;
 
+
+/**
+ * @Security("is_granted('ROLE_USER')")
+ */
 class AccueilController extends AbstractController {
 
     /**
@@ -34,43 +39,47 @@ class AccueilController extends AbstractController {
         $allEvents = array();
         $myAcces = false;
 
-//Connexion base de donnée
+        //Connexion base de donnée
         $bdd = $this->getDoctrine()->getManager();
 
-//Recupération de l'utilisateur connecté
+        //Recupération de l'utilisateur connecté
         $User = $this->getUser();
-
-        $query1 = $bdd->createQuery('SELECT Acc, A FROM App\Entity\Acceder Acc JOIN Acc.Ref_Agendas A WHERE Acc.Ref_Personne = :Personne'); //Recherche des agendas
+        
+        //Recuperation des agendas appartir de l'id Personne
+        $query1 = $bdd->createQuery('SELECT Acc, A FROM App\Entity\Acceder Acc JOIN Acc.Ref_Agendas A WHERE Acc.Ref_Personne = :Personne');
         $query1->setParameter(':Personne', $User);
         $allAgendas = $query1->getResult();
 
-        $query2 = $bdd->createQuery('SELECT D FROM App\Entity\Droit D'); //Recherche des droits
+        //Recuperation des droits
+        $query2 = $bdd->createQuery('SELECT D FROM App\Entity\Droit D');
         $allDroit = $query2->getResult();
 
-        $query3 = $bdd->createQuery('SELECT C FROM App\Entity\Categorie C'); //Recherche des categories
+         //Recuperation des categories
+        $query3 = $bdd->createQuery('SELECT C FROM App\Entity\Categorie C');
         $allCategorie = $query3->getResult();
 
+        //Gestion du filtre agenda
         if (isset($_POST['selectAgenda']) || $idAgendaSelect !== null) {
             $idAgendaSelect = $_POST['selectAgenda'] ?? $idAgendaSelect;
             if ($idAgendaSelect !== 'all') {
                 foreach ($allAgendas as $unAgenda) {
                     if ($unAgenda->getAgendas()->getId() == $idAgendaSelect) {
                         $selectedAgenda = $unAgenda->getAgendas();
-
-                        $query3 = $bdd->createQuery('SELECT E FROM App\Entity\Evenement E JOIN E.Agenda A WHERE A.id = :Agenda '); //Recherche des droit
+                        
+                        //Récupération des evenements par agenda
+                        $query3 = $bdd->createQuery('SELECT E FROM App\Entity\Evenement E JOIN E.Agenda A WHERE A.id = :Agenda ');
                         $query3->setParameter(':Agenda', $selectedAgenda);
                         $allEvents[] = $query3->getResult();
-
-                        $query4 = $bdd->createQuery('SELECT Acc, P, D FROM App\Entity\Acceder Acc JOIN Acc.Ref_Agendas A JOIN Acc.Ref_Personne P JOIN Acc.Id_Droit D WHERE Acc.Ref_Agendas = :Agenda'); //Recherche des droit
+                        
+                        //Récupération des acces, des personnes, des droits par gendas
+                        $query4 = $bdd->createQuery('SELECT Acc, P, D FROM App\Entity\Acceder Acc JOIN Acc.Ref_Agendas A JOIN Acc.Ref_Personne P JOIN Acc.Id_Droit D WHERE Acc.Ref_Agendas = :Agenda');
                         $query4->setParameter(':Agenda', $selectedAgenda);
                         $allAcces = $query4->getResult();
-
-//                        dump($allAcces);
-
                         break;
                     }
                 }
 
+                //Gestion des accès en fonction de l'agenda selectionné
                 $myAcces = false;
                 foreach ($allAcces as $unAcces) {
                     if ($unAcces->getRefPersonne()->getId() == $User->getId()) {
@@ -80,16 +89,17 @@ class AccueilController extends AbstractController {
                     }
                 }
             } else {
-
+                //Récupération des evenements par agenda
                 foreach ($allAgendas as $unAgenda) {
-                    $query4 = $bdd->createQuery('SELECT E FROM App\Entity\Evenement E JOIN E.Agenda A WHERE A.id = :Agenda'); //Recherche des droit
+                    $query4 = $bdd->createQuery('SELECT E FROM App\Entity\Evenement E JOIN E.Agenda A WHERE A.id = :Agenda');
                     $query4->setParameter(':Agenda', $unAgenda->getAgendas());
                     $allEvents[] = $query4->getResult();
                 }
             }
         } else {
+            //Récupération des evenements par agenda
             foreach ($allAgendas as $unAgenda) {
-                $query4 = $bdd->createQuery('SELECT E FROM App\Entity\Evenement E JOIN E.Agenda A WHERE A.id = :Agenda'); //Recherche des droit
+                $query4 = $bdd->createQuery('SELECT E FROM App\Entity\Evenement E JOIN E.Agenda A WHERE A.id = :Agenda');
                 $query4->setParameter(':Agenda', $unAgenda->getAgendas());
                 $allEvents[] = $query4->getResult();
             }
@@ -119,6 +129,7 @@ class AccueilController extends AbstractController {
     }
 
     /**
+     * Route de mise a jour des utilisateurs
      * @Route("/updateUser/{uneDate}/{id}", name="updateUser", defaults={"uneDate"=null})
      */
     public function updateUser($uneDate, Personne $User, LoginFormAuthenticator $authenticator): Response {
@@ -133,6 +144,7 @@ class AccueilController extends AbstractController {
         $User->setEmail($_POST['inputEmailUser']);
         $User->setDatenaissance(date_create($_POST['inputDtNaissUser']));
 
+        //Gestion de la modification du mot de passe
         if (!empty($_POST['inputPwd1']) && !empty($_POST['inputPwd2'])) {
             if ($_POST['inputPwd1'] == $_POST['inputPwd2']) {
                 $mdp = $authenticator->encoderMdp($User, $_POST['inputPwd2']);
@@ -144,23 +156,24 @@ class AccueilController extends AbstractController {
     }
 
     /**
+     * Route de d'insertion d'un agenda
      * @Route("/insertAgenda/{uneDate}/{id}", name="insertAgenda", defaults={"uneDate"=null})
      */
     public function insertAgenda($uneDate, Personne $User): Response {
 
         $Date = new DatePerso();
-        $Agenda = new Agenda(); //Instanciation d'un nouvelle agenda
-        $Acces = new Acceder(); //Instanciation d'un nouvelle acces
+        $Agenda = new Agenda(); 
+        $Acces = new Acceder(); 
         $bdd = $this->getDoctrine()->getManager(); //Recupération de la connexion a la bdd
 
         $query = $bdd->createQuery('SELECT d FROM App\Entity\Droit d WHERE d.id = 1'); //Recherche du droit Lecture|Ecriture
         $Droit = $query->getResult();
 
-//Modification des information agenda
+        //Modification des information agenda
         $Agenda->setNom($_POST['inputNom']);
         $Agenda->setImg($_FILES['fileImg']['name']);
 
-//Modification des informations d'acces
+        //Modification des informations d'acces
         $Acces->setRefPersonne($User);
         $Acces->setIdDroit($Droit[0]);
 
@@ -179,6 +192,7 @@ class AccueilController extends AbstractController {
     }
 
     /**
+     * Route de mise a jour de l'agenda
      * @Route("/updateAgenda/{uneDate}/{id}", name="updateAgenda", defaults={"uneDate"=null})
      */
     public function updateAgenda($uneDate, Agenda $unAgenda): Response {
@@ -199,6 +213,7 @@ class AccueilController extends AbstractController {
     }
 
     /**
+     * Rout de supressions des agendas
      * @Route("/delAgenda/{uneDate}/{id}", name="delAgenda", defaults={"uneDate"=null})
      */
     public function delAgenda($uneDate, Agenda $unAgenda): Response {
@@ -227,24 +242,27 @@ class AccueilController extends AbstractController {
     }
 
     /**
-     * @Route("/shareAgenda}", name="shareAgenda", defaults={"uneDate"=null})
+     * Route pour le partage d'agenda
+     * @Route("/shareAgenda", name="shareAgenda", defaults={"uneDate"=null})
      */
     public function shareAgenda(Swift_Mailer $mailer): Response {
-
-//        $_POST['mail'] = "happynutty974@gmail.com";
-//        $_POST['expediteur'] = "102";
-//        $_POST['agenda'] = "103";
 
         $bdd = $this->getDoctrine()->getManager(); //Recupération de la connexion a la bdd
         $jsonData = array();
 
+        //Verifie si on recupère le mail, l'expediteur et l'agenda de la requete POST
         if (isset($_POST['mail']) && isset($_POST['expediteur']) && isset($_POST['agenda'])) {
+            //Récupére l'expediteur a partir de l'id
             $Expediteur = $bdd->getRepository(Personne::class)->find($_POST['expediteur']);
+            //Recupère le destinataire a partir de l'email 
             $Receveur = $bdd->getRepository(Personne::class)->findOneBy(array('email' => $_POST['mail']));
+            //Recupère l'agenda
             $Agenda = $bdd->getRepository(Agenda::class)->find($_POST['agenda']);
             $Interval = new DateInterval('P1D');
 
+            //Si le destinatair n'est pas vide
             if (!empty($Receveur)) {
+                //Si on a un clé et qu'elle à été généré a plus d'un jour on génère une nouvelle
                 if (empty($Agenda->getCle()) || ($Agenda->getDtCle()->add($Interval) >= date_create())) {
                     $Agenda->setCle(uniqid($Agenda->getId()));
                     $Agenda->setDtCle(date_create());
@@ -252,6 +270,7 @@ class AccueilController extends AbstractController {
                     $bdd->flush();
                 }
                 $Cle = $Agenda->getCle();
+                //Création et envoie du mail
                 if (!empty($Cle)) {
                     $link = 'http://localhost:8000/confirmeAgenda/' . $Receveur->getId() . '/' . $Cle;
 
@@ -261,10 +280,8 @@ class AccueilController extends AbstractController {
                     $message = (new \Swift_Message($subject))
                             ->setFrom('noreply@angenda.com')
                             ->setTo($to)
-//                            ->setBody($corps);
                             ->setBody(
                             $this->renderView(
-                                    // templates/hello/email.txt.twig
                                     'mail/mail.html.twig',
                                     [
                                         'expediteur' => empty($Expediteur->getNomPrenom()) ? $Expediteur->getEmail() : $Expediteur->getNomPrenom(),
@@ -274,7 +291,8 @@ class AccueilController extends AbstractController {
                     );
 
                     $mailer->send($message);
-
+                    
+                    //Retour de confirmation JSON pour confirmer l'envoie
                     $jsonData = array('Nom_Personnes' => empty($Receveur->getNomPrenom()) ? $Receveur->getEmail() : $Receveur->getNomPrenom());
                 }
             }
@@ -284,6 +302,7 @@ class AccueilController extends AbstractController {
     }
 
     /**
+     * Route pour geré la confirmation d'acces a un agenda
      * @Route("/confirmeAgenda/{id}/{key}", name="confirmeAgenda", defaults={"key"=null})
      */
     public function confirmeAgenda(Personne $Personne, $key): Response {
@@ -317,8 +336,6 @@ class AccueilController extends AbstractController {
 
         $User = $this->getUser();
         $myAcces = $bdd->getRepository(Acceder::class)->findOneBy(array('Ref_Personne' => $User, 'Ref_Agendas' => $Agenda));
-
-        dump($myAcces);
         
         if($myAcces->getIdDroit()->getId() == 1) {
             $Acces = $bdd->getRepository(Acceder::class)->findOneBy(array('Ref_Personne' => $Personne, 'Ref_Agendas' => $Agenda));
@@ -338,6 +355,36 @@ class AccueilController extends AbstractController {
 
         return new JsonResponse($jsonData);
     }
+    
+    /**
+     * @Route("/deleteAccesAgenda/{uneDate}", name="deleteAccesAgenda", defaults={"uneDate"=null})
+     */
+    public function deleteAccesAgenda($uneDate): Response {
+        $Date = new DatePerso();
+        $bdd = $this->getDoctrine()->getManager(); //Recupération de la connexion a la bdd 
+
+        $Personne = $bdd->getRepository(Personne::class)->find($_POST['user']);
+        $Agenda = $bdd->getRepository(Agenda::class)->find($_POST['agenda']);
+
+        $User = $this->getUser();
+        $myAcces = $bdd->getRepository(Acceder::class)->findOneBy(array('Ref_Personne' => $User, 'Ref_Agendas' => $Agenda));
+        
+        if($myAcces->getIdDroit()->getId() == 1) {
+            $Acces = $bdd->getRepository(Acceder::class)->findOneBy(array('Ref_Personne' => $Personne, 'Ref_Agendas' => $Agenda));
+
+            $bdd->remove($Acces);
+            $bdd->flush();
+            $jsonData = array('msg'=>'Le droit à été supprimer.');
+        }else{
+            $jsonData = array('msg'=>'Vous n\'avez pas les droits.');
+        }
+
+        if (!empty($uneDate)) {
+            $Date->majDate($uneDate);
+        }
+
+        return new JsonResponse($jsonData);
+    }
 
     /**
      * @Route("/insertEvent/{uneDate}", name="insertEvent", defaults={"uneDate"=null})
@@ -345,18 +392,25 @@ class AccueilController extends AbstractController {
     public function insertEvent($uneDate): Response {
 
         $Date = new DatePerso();
-        $bdd = $this->getDoctrine()->getManager(); //Recupération de la connexion a la bdd
-        $Agenda = $bdd->getRepository(Agenda::class)->find($_POST['selectAgendaForm']);
+        $bdd = $this->getDoctrine()->getManager();
+        $Agenda = $bdd->getRepository(Agenda::class)->find($_POST['selectAgendaForm']); //Récupération de l'agenda par son id
         $Personne = $this->getUser();
-        $Categorie = $bdd->getRepository(Categorie::class)->find($_POST['selectCategorie']);
+        $Categorie = $bdd->getRepository(Categorie::class)->find($_POST['selectCategorie']); //Récupération de la catégorie par son id
+        //Récupération de l'accès par la référence personne et agenda
         $Acces = $bdd->getRepository(Acceder::class)->findOneBy(array('Ref_Agendas' => $Agenda, 'Ref_Personne' => $Personne));
 
+        //Si l'utilisateur peut ecrire alors
         if ($Acces->getIdDroit()->getId() == 1) {
+            //Si la récurence, le type recurence et la date de fin n'est pas vide 
             if (!empty($_POST['inputRecurrence']) && !empty($_POST['typeRecurrence']) && !empty($_POST['finRecurrence'])) {
+                //Création de l'intervale
                 $Interval = new DateInterval('P' . $_POST['inputRecurrence'] . $_POST['typeRecurrence']);
+                //Creation de la période
                 $DateRange = new DatePeriod(date_create($_POST['dtDebut']), $Interval, date_create($_POST['finRecurrence'] . ' +1 day'));
-
+                
+                //Parcour des dates
                 foreach ($DateRange as $uneDateEvent) {
+                    //Creation et setting des attributs
                     $Event = new Evenement();
                     $Event->setLibelle($_POST['inputLibelle']);
                     $Event->setNote($_POST['inputNote']);
@@ -366,9 +420,10 @@ class AccueilController extends AbstractController {
                     $Event->setDateFin(date_create($uneDateEvent->format('Y-m-d ') . $_POST['timeFin']));
                     $Event->setAgenda($Agenda);
                     $Event->setCategorie($Categorie);
-                    $bdd->persist($Event);
+                    $bdd->persist($Event); //Enregistrement dans le manager
                 }
-            } else {
+            } else { //Si il n'a qu'un evenement a enregistrer
+                //Création et setting des attributs
                 $Event = new Evenement();
                 $Event->setLibelle($_POST['inputLibelle']);
                 $Event->setNote($_POST['inputNote']);
@@ -383,10 +438,13 @@ class AccueilController extends AbstractController {
 
             $bdd->flush(); //Enregistre les changements dans la bdd
         }
+        
+        //Met a jour la date si il y'en a une
         if (!empty($uneDate)) {
             $Date->majDate($uneDate);
         }
-
+        
+        //Redirection sur la route accueil
         return $this->redirectToRoute('accueil', ['Date' => $Date]);
     }
 

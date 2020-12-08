@@ -21,6 +21,7 @@ class AdminUserFormType extends AbstractType {
         $builder
                 ->add('id', IntegerType::class,
                         [
+                            'required' => false,
                             'attr'       => ['hidden' => 'true'],
                             'label_attr' => ['hidden' => 'true']])
                 ->add('Nom_Personnes', TextType::class,
@@ -36,17 +37,19 @@ class AdminUserFormType extends AbstractType {
                         [
                             'attr'       => ['class' => 'form-control'],
                             'label_attr' => ['class' => 'input-group-text']])
-//                ->add('password', PasswordType::class,
-//                        ['constraints' => [
-//                                new Length([
-//                                    'min'        => 6,
-//                                    'minMessage' => 'Votre mot de passe doit comporter au moin {{ limit }} characters',
-//                                    // max length allowed by Symfony for security reasons
-//                                    'max'        => 4096,
-//                                        ]),
-//                            ],
-//                            'attr'        => ['class' => 'form-control'],
-//                            'label_attr'  => ['class' => 'input-group-text']])
+                ->add('password', PasswordType::class,
+                        [
+                            'required' => false,
+                            'constraints' => [
+                                new Length([
+                                    'min'        => 6,
+                                    'minMessage' => 'Votre mot de passe doit comporter au moin {{ limit }} characters',
+                                    // max length allowed by Symfony for security reasons
+                                    'max'        => 4096,
+                                        ]),
+                            ],
+                            'attr'        => ['class' => 'form-control'],
+                            'label_attr'  => ['class' => 'input-group-text']])
         ;
     }
 

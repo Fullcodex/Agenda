@@ -60,13 +60,14 @@ class AdminController extends AbstractController {
 //                    }
                     $bdd->flush();
                 }
-//                elseif (isset($_POST['insertUser']) && $formRequest->isValid()) {
-//                    $bdd->persist($User);
-//                    $User->setPassword(
-//                            $passwordEncoder->encodePassword($User, $formRequest->getData()->getPassword())
-//                    );
-//                    $bdd->flush();
-//                }
+                elseif (isset($_POST['insertUser']) && $formRequest->isValid()) {
+                    $User = $formRequest->getData();
+                    $User->setPassword(
+                            $passwordEncoder->encodePassword($User, $formRequest->getData()->getPassword())
+                    );
+                    $bdd->persist($User);
+                    $bdd->flush();
+                }
                 elseif (isset($_POST['deleteUser'])) {
                     $User = $bdd->getRepository(Personne::class)->find($formRequest->getData()->getid());
                     $bdd->remove($User);
