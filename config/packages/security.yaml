@@ -17,6 +17,8 @@ security:
         main:
             anonymous: true
             lazy: true
+            json_login:
+                check_path: loginExt
             provider: app_user_provider
             guard:
                 authenticators:
@@ -35,6 +37,7 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+        - { path: ^/loginExt, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/admin, roles: [IS_AUTHENTICATED_FULLY, ROLE_ADMIN]}

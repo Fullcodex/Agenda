@@ -22,13 +22,13 @@ use DateInterval;
 use DatePeriod;
 use function dump;
 
-
 /**
  * @Security("is_granted('ROLE_USER')")
  */
 class AccueilController extends AbstractController {
 
     /**
+     * Route par default qui affiche l'agenda
      * @Route("/accueil/{uneDate}/{idAgendaSelect}", name="accueil", defaults={"uneDate"=null, "idAgendaSelect"=null})
      */
     public function index($uneDate, $idAgendaSelect): Response {
@@ -44,7 +44,7 @@ class AccueilController extends AbstractController {
 
         //Recupération de l'utilisateur connecté
         $User = $this->getUser();
-        
+
         //Recuperation des agendas appartir de l'id Personne
         $query1 = $bdd->createQuery('SELECT Acc, A FROM App\Entity\Acceder Acc JOIN Acc.Ref_Agendas A WHERE Acc.Ref_Personne = :Personne');
         $query1->setParameter(':Personne', $User);
@@ -54,7 +54,7 @@ class AccueilController extends AbstractController {
         $query2 = $bdd->createQuery('SELECT D FROM App\Entity\Droit D');
         $allDroit = $query2->getResult();
 
-         //Recuperation des categories
+        //Recuperation des categories
         $query3 = $bdd->createQuery('SELECT C FROM App\Entity\Categorie C');
         $allCategorie = $query3->getResult();
 
@@ -65,12 +65,12 @@ class AccueilController extends AbstractController {
                 foreach ($allAgendas as $unAgenda) {
                     if ($unAgenda->getAgendas()->getId() == $idAgendaSelect) {
                         $selectedAgenda = $unAgenda->getAgendas();
-                        
+
                         //Récupération des evenements par agenda
                         $query3 = $bdd->createQuery('SELECT E FROM App\Entity\Evenement E JOIN E.Agenda A WHERE A.id = :Agenda ');
                         $query3->setParameter(':Agenda', $selectedAgenda);
                         $allEvents[] = $query3->getResult();
-                        
+
                         //Récupération des acces, des personnes, des droits par gendas
                         $query4 = $bdd->createQuery('SELECT Acc, P, D FROM App\Entity\Acceder Acc JOIN Acc.Ref_Agendas A JOIN Acc.Ref_Personne P JOIN Acc.Id_Droit D WHERE Acc.Ref_Agendas = :Agenda');
                         $query4->setParameter(':Agenda', $selectedAgenda);
@@ -88,7 +88,8 @@ class AccueilController extends AbstractController {
                         }
                     }
                 }
-            } else {
+            }
+            else {
                 //Récupération des evenements par agenda
                 foreach ($allAgendas as $unAgenda) {
                     $query4 = $bdd->createQuery('SELECT E FROM App\Entity\Evenement E JOIN E.Agenda A WHERE A.id = :Agenda');
@@ -96,7 +97,8 @@ class AccueilController extends AbstractController {
                     $allEvents[] = $query4->getResult();
                 }
             }
-        } else {
+        }
+        else {
             //Récupération des evenements par agenda
             foreach ($allAgendas as $unAgenda) {
                 $query4 = $bdd->createQuery('SELECT E FROM App\Entity\Evenement E JOIN E.Agenda A WHERE A.id = :Agenda');
@@ -116,15 +118,15 @@ class AccueilController extends AbstractController {
         }
 
         return $this->render('accueil/index.html.twig', [
-                    'User' => $User,
-                    'Date' => $Date,
-                    'allAgendas' => $allAgendas,
-                    'allDroits' => $allDroit,
-                    'allCategorie' => $allCategorie,
-                    'allAcces' => $allAcces,
-                    'allEvents' => $allEvents,
+                    'User'           => $User,
+                    'Date'           => $Date,
+                    'allAgendas'     => $allAgendas,
+                    'allDroits'      => $allDroit,
+                    'allCategorie'   => $allCategorie,
+                    'allAcces'       => $allAcces,
+                    'allEvents'      => $allEvents,
                     'selectedAgenda' => $selectedAgenda,
-                    'myAcces' => $myAcces
+                    'myAcces'        => $myAcces
         ]);
     }
 
@@ -162,8 +164,8 @@ class AccueilController extends AbstractController {
     public function insertAgenda($uneDate, Personne $User): Response {
 
         $Date = new DatePerso();
-        $Agenda = new Agenda(); 
-        $Acces = new Acceder(); 
+        $Agenda = new Agenda();
+        $Acces = new Acceder();
         $bdd = $this->getDoctrine()->getManager(); //Recupération de la connexion a la bdd
 
         $query = $bdd->createQuery('SELECT d FROM App\Entity\Droit d WHERE d.id = 1'); //Recherche du droit Lecture|Ecriture
@@ -285,13 +287,13 @@ class AccueilController extends AbstractController {
                                     'mail/mail.html.twig',
                                     [
                                         'expediteur' => empty($Expediteur->getNomPrenom()) ? $Expediteur->getEmail() : $Expediteur->getNomPrenom(),
-                                        'link' => $link
+                                        'link'       => $link
                                     ]
                             )
                     );
 
                     $mailer->send($message);
-                    
+
                     //Retour de confirmation JSON pour confirmer l'envoie
                     $jsonData = array('Nom_Personnes' => empty($Receveur->getNomPrenom()) ? $Receveur->getEmail() : $Receveur->getNomPrenom());
                 }
@@ -336,17 +338,18 @@ class AccueilController extends AbstractController {
 
         $User = $this->getUser();
         $myAcces = $bdd->getRepository(Acceder::class)->findOneBy(array('Ref_Personne' => $User, 'Ref_Agendas' => $Agenda));
-        
-        if($myAcces->getIdDroit()->getId() == 1) {
+
+        if ($myAcces->getIdDroit()->getId() == 1) {
             $Acces = $bdd->getRepository(Acceder::class)->findOneBy(array('Ref_Personne' => $Personne, 'Ref_Agendas' => $Agenda));
             $Droit = $bdd->getRepository(Droit::class)->find($_POST['droit']);
 
             $Acces->setIdDroit($Droit);
             $bdd->persist($Acces);
             $bdd->flush();
-            $jsonData = array('msg'=>'Le droit à été modifier.');
-        }else{
-            $jsonData = array('msg'=>'Vous n\'avez pas les droits.');
+            $jsonData = array('msg' => 'Le droit à été modifier.');
+        }
+        else {
+            $jsonData = array('msg' => 'Vous n\'avez pas les droits.');
         }
 
         if (!empty($uneDate)) {
@@ -355,7 +358,7 @@ class AccueilController extends AbstractController {
 
         return new JsonResponse($jsonData);
     }
-    
+
     /**
      * @Route("/deleteAccesAgenda/{uneDate}", name="deleteAccesAgenda", defaults={"uneDate"=null})
      */
@@ -368,15 +371,16 @@ class AccueilController extends AbstractController {
 
         $User = $this->getUser();
         $myAcces = $bdd->getRepository(Acceder::class)->findOneBy(array('Ref_Personne' => $User, 'Ref_Agendas' => $Agenda));
-        
-        if($myAcces->getIdDroit()->getId() == 1) {
+
+        if ($myAcces->getIdDroit()->getId() == 1) {
             $Acces = $bdd->getRepository(Acceder::class)->findOneBy(array('Ref_Personne' => $Personne, 'Ref_Agendas' => $Agenda));
 
             $bdd->remove($Acces);
             $bdd->flush();
-            $jsonData = array('msg'=>'Le droit à été supprimer.');
-        }else{
-            $jsonData = array('msg'=>'Vous n\'avez pas les droits.');
+            $jsonData = array('msg' => 'Le droit à été supprimer.');
+        }
+        else {
+            $jsonData = array('msg' => 'Vous n\'avez pas les droits.');
         }
 
         if (!empty($uneDate)) {
@@ -387,6 +391,7 @@ class AccueilController extends AbstractController {
     }
 
     /**
+     * Route permetant l'insertion d'un ou de plusieurs evenement
      * @Route("/insertEvent/{uneDate}", name="insertEvent", defaults={"uneDate"=null})
      */
     public function insertEvent($uneDate): Response {
@@ -407,7 +412,7 @@ class AccueilController extends AbstractController {
                 $Interval = new DateInterval('P' . $_POST['inputRecurrence'] . $_POST['typeRecurrence']);
                 //Creation de la période
                 $DateRange = new DatePeriod(date_create($_POST['dtDebut']), $Interval, date_create($_POST['finRecurrence'] . ' +1 day'));
-                
+
                 //Parcour des dates
                 foreach ($DateRange as $uneDateEvent) {
                     //Creation et setting des attributs
@@ -422,7 +427,8 @@ class AccueilController extends AbstractController {
                     $Event->setCategorie($Categorie);
                     $bdd->persist($Event); //Enregistrement dans le manager
                 }
-            } else { //Si il n'a qu'un evenement a enregistrer
+            }
+            else { //Si il n'a qu'un evenement a enregistrer
                 //Création et setting des attributs
                 $Event = new Evenement();
                 $Event->setLibelle($_POST['inputLibelle']);
@@ -438,12 +444,12 @@ class AccueilController extends AbstractController {
 
             $bdd->flush(); //Enregistre les changements dans la bdd
         }
-        
+
         //Met a jour la date si il y'en a une
         if (!empty($uneDate)) {
             $Date->majDate($uneDate);
         }
-        
+
         //Redirection sur la route accueil
         return $this->redirectToRoute('accueil', ['Date' => $Date]);
     }
@@ -460,15 +466,15 @@ class AccueilController extends AbstractController {
 
         $jsonData = array(
             'Ref_Evenements' => $Event->getId(),
-            'Libelle' => $Event->getLibelle(),
-            'Note' => $Event->getNote(),
-            'DateDebut' => $Event->getDateDebut()->format('Y-m-d h:s'),
-            'DateFin' => $Event->getDateFin()->format('Y-m-d h:s'),
-            'Lieu' => $Event->getLieu(),
-            'Couleur' => $Event->getCouleur(),
-            'Ref_Agendas' => $Event->getAgenda()->getId(),
-            'Ref_Categorie' => $Event->getCategorie()->getId(),
-            'Id_Droit_D' => $Acces->getIdDroit()->getId()
+            'Libelle'        => $Event->getLibelle(),
+            'Note'           => $Event->getNote(),
+            'DateDebut'      => $Event->getDateDebut()->format('Y-m-d h:s'),
+            'DateFin'        => $Event->getDateFin()->format('Y-m-d h:s'),
+            'Lieu'           => $Event->getLieu(),
+            'Couleur'        => $Event->getCouleur(),
+            'Ref_Agendas'    => $Event->getAgenda()->getId(),
+            'Ref_Categorie'  => $Event->getCategorie()->getId(),
+            'Id_Droit_D'     => $Acces->getIdDroit()->getId()
         );
 
         return new JsonResponse($jsonData);
@@ -492,11 +498,11 @@ class AccueilController extends AbstractController {
                 $Interval = date_diff($Event->getDateDebut(), date_create($_POST['dtDebut'] . $_POST['timeDebut']));
 
                 $AllEvent = $bdd->getRepository(Evenement::class)->findBy(array(
-                    'Agenda' => $Event->getAgenda(),
+                    'Agenda'    => $Event->getAgenda(),
                     'Categorie' => $Event->getCategorie(),
-                    'Libelle' => $Event->getLibelle(),
-                    'Note' => $Event->getNote(),
-                    'Lieu' => $Event->getLieu()
+                    'Libelle'   => $Event->getLibelle(),
+                    'Note'      => $Event->getNote(),
+                    'Lieu'      => $Event->getLieu()
                 ));
                 foreach ($AllEvent as $unEvent) {
                     $unEvent->setLibelle($_POST['inputLibelle']);
@@ -509,7 +515,8 @@ class AccueilController extends AbstractController {
                     $unEvent->setCategorie($Categorie);
                     $bdd->persist($Event);
                 }
-            } else {
+            }
+            else {
                 $Event = $bdd->getRepository(Evenement::class)->find($_POST['updateEvenement']);
 
                 $Event->setLibelle($_POST['inputLibelle']);
@@ -548,17 +555,18 @@ class AccueilController extends AbstractController {
         if ($Acces->getIdDroit()->getId() == 1) {
             if (isset($_POST['checkIntervale'])) {
                 $AllEvent = $bdd->getRepository(Evenement::class)->findBy(array(
-                    'Agenda' => $Event->getAgenda(),
+                    'Agenda'    => $Event->getAgenda(),
                     'Categorie' => $Event->getCategorie(),
-                    'Libelle' => $Event->getLibelle(),
-                    'Note' => $Event->getNote(),
-                    'Lieu' => $Event->getLieu()
+                    'Libelle'   => $Event->getLibelle(),
+                    'Note'      => $Event->getNote(),
+                    'Lieu'      => $Event->getLieu()
                 ));
                 foreach ($AllEvent as $unEvent) {
                     $bdd->remove($unEvent);
                     $bdd->flush();
                 }
-            } else {
+            }
+            else {
                 $bdd->remove($Event);
                 $bdd->flush();
             }
@@ -569,6 +577,18 @@ class AccueilController extends AbstractController {
         }
 
         return $this->redirectToRoute('accueil', ['Date' => $Date]);
+    }
+
+    /**
+     * @Route("/getPersonne", name="getPersonne")
+     */
+    public function getPersonne(): Response {
+        $jsonData = array();
+        $User = $this->getUser();
+        if (!empty($User)) {
+            $jsonData = array('id'=>$User->getId());
+        }
+        return new JsonResponse($jsonData);
     }
 
 }
