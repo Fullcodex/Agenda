@@ -580,13 +580,25 @@ class AccueilController extends AbstractController {
     }
 
     /**
-     * @Route("/getPersonne", name="getPersonne")
+     * @Route("/getNotif", name="getNotif")
      */
-    public function getPersonne(): Response {
+    public function getNotif(): Response {
         $jsonData = array();
+        $bdd = $this->getDoctrine()->getManager(); //Recupération de la connexion a la bdd
         $User = $this->getUser();
-        if (!empty($User)) {
-            $jsonData = array('id'=>$User->getId());
+        $query = $bdd->createQuery('SELECT Acc, A, E FROM App\Entity\Acceder Acc JOIN Acc.Ref_Agendas A JOIN A.Evenement E WHERE Acc.Ref_Personne = :Personne ORDER BY E.DateDebut DESC'); //Recherche des droit
+        $query->setMaxResults(1);
+        $query->setParameter(':Personne', $User);
+        $Acces = $query->getResult();
+
+        $Notifs= $Acces[0]->getAgendas()->getEvenement();
+        foreach ($Notifs as $uneNotif) {
+            $jsonData = array(
+                'Libelle' => $uneNotif->getLibelle(),
+                'DateDebut' => $uneNotif->getDateDebut()->format('d-m-Y H:i'),
+                'Note' => $uneNotif->getNote(),
+                'Lieu' => $uneNotif->getLieu()
+            );
         }
         return new JsonResponse($jsonData);
     }

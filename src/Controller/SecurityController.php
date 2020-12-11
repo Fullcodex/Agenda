@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
@@ -31,12 +32,13 @@ class SecurityController extends AbstractController
      */
     public function loginExt(Request $request)
     {
-        $user = $this->getUser();
+        $user = $this->getUser(); 
 
         return $this->json([
             'username' => $user->getUsername(),
-            'roles' => $user->getRoles(),
+            'roles' => $user->getRoles()
         ]);
+        
     }
 
     /**

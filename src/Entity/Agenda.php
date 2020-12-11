@@ -67,6 +67,10 @@ class Agenda {
         return $this->Img;
     }
     
+     public function getEvenement(): ?object {
+        return $this->Evenement;
+    }
+    
     public function setId($id): ?self {
         $this->id = $id;
 
