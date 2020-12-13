@@ -3,46 +3,70 @@
 {% block title %}Agenda|Accueil{% endblock %}
 
 {% block main %}
-    <style>
-        .tbl-td-calendar{
-            height: 160px;
-        }
-    </style>
-    <table class="table table-bordered">
-        <tr>
-            <th>Lun</th>
-            <th>Mar</th>
-            <th>Mer</th>
-            <th>Jeu</th>
-            <th>Ven</th>
-            <th>Sam</th>
-            <th>Dim</th>
-        </tr>
+    {% if affichage == 0 %}
+        <style>
+            .tbl-td-calendar{
+                height: 160px;
+            }
+        </style>
+        <table class="table table-bordered">
+            <tr>
+                <th>Lun</th>
+                <th>Mar</th>
+                <th>Mer</th>
+                <th>Jeu</th>
+                <th>Ven</th>
+                <th>Sam</th>
+                <th>Dim</th>
+            </tr>
 
-        {% for day in Date.getDateRage %}
-            {% if day.format('N') == 1 %}
-                <tr>
-                {% endif %}
-                <td class="{#<?= $moisCourant !== $uneDate->format('m') ? 'text-muted' : null ?>#}  tbl-td-calendar" >
+            {% for day in Date.getDateRage %}
+                {% if day.format('N') == 1 %}
+                    <tr>
+                    {% endif %}
+                    <td class="{#<?= $moisCourant !== $uneDate->format('m') ? 'text-muted' : null ?>#}  tbl-td-calendar" >
 
-                    <div class="row justify-content-between">
-                        <span class="col-auto"> {{ day.format('j') }}</span>                     
-                    </div>
-                    <div style="overflow-y: scroll; max-height: 100px;">
-                        {% for unAgenda in allEvents %}
-                            {% for unEvent in unAgenda %}
-                                {% if unEvent.getDateDebut().format('Y-m-d') ==  day.format('Y-m-d') %}
-                                    <div>
-                                        <button class="btn mt-1" style="background-color: {{ unEvent.getCouleur() }}; color:black"  data-toggle="modal" data-target="#ModalEvenement" data-whatever="{{ unEvent.getId()~'|'~unEvent.getAgenda().getId() }}">
-                                            {{ unEvent.getLibelle() }}
-                                        </button>
-                                    </div>
-                                {% endif %}
+                        <div class="row justify-content-between">
+                            <span class="col-auto"> {{ day.format('j') }}</span>                     
+                        </div>
+                        <div style="overflow-y: scroll; max-height: 100px;">
+                            {% for unAgenda in allEvents %}
+                                {% for unEvent in unAgenda %}
+                                    {% if unEvent.getDateDebut().format('Y-m-d') ==  day.format('Y-m-d') %}
+                                        <div>
+                                            <button class="btn mt-1" style="background-color: {{ unEvent.getCouleur() }}; color:black"  data-toggle="modal" data-target="#ModalEvenement" data-whatever="{{ unEvent.getId()~'|'~unEvent.getAgenda().getId() }}">
+                                                {{ unEvent.getLibelle() }}
+                                            </button>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
                             {% endfor %}
-                        {% endfor %}
 
-                    </div>
-                </td>
-            {% endfor %}
-    </table>
+                        </div>
+                    </td>
+                {% endfor %}
+        </table>
+    {% else %}
+        <table class="table table-bordered table-responsive">
+            {% for key, ligne in tabGantt %}
+                <tr>
+                    {% for cell in ligne %}
+                        {% if key == 'date'%}
+                            <th>{{ cell }}</th>
+                            {% else %}
+                                {% if cell %}
+                                <td>
+                                    <button class="btn mt-1" style="background-color: {{ cell.getCouleur() }}; color:black"  data-toggle="modal" data-target="#ModalEvenement" data-whatever="{{ cell.getId()~'|'~cell.getAgenda().getId() }}">
+                                        {{ cell.getLibelle() }}
+                                    </button>
+                                </td>
+                            {% else %}
+                                <td></td>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                <tr>
+                {% endfor %}
+        </table>
+    {% endif %}
 {% endblock %}

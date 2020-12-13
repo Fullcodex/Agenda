@@ -37,6 +37,7 @@ class AccueilController extends AbstractController {
         $selectedAgenda = null;
         $allAcces = array();
         $allEvents = array();
+        $tabGant = array();
         $myAcces = false;
 
         //Connexion base de donnée
@@ -67,7 +68,7 @@ class AccueilController extends AbstractController {
                         $selectedAgenda = $unAgenda->getAgendas();
 
                         //Récupération des evenements par agenda
-                        $query3 = $bdd->createQuery('SELECT E FROM App\Entity\Evenement E JOIN E.Agenda A WHERE A.id = :Agenda ');
+                        $query3 = $bdd->createQuery('SELECT E FROM App\Entity\Evenement E JOIN E.Agenda A WHERE A.id = :Agenda ORDER BY E.Libelle');
                         $query3->setParameter(':Agenda', $selectedAgenda);
                         $allEvents[] = $query3->getResult();
 
@@ -92,7 +93,7 @@ class AccueilController extends AbstractController {
             else {
                 //Récupération des evenements par agenda
                 foreach ($allAgendas as $unAgenda) {
-                    $query4 = $bdd->createQuery('SELECT E FROM App\Entity\Evenement E JOIN E.Agenda A WHERE A.id = :Agenda');
+                    $query4 = $bdd->createQuery('SELECT E FROM App\Entity\Evenement E JOIN E.Agenda A WHERE A.id = :Agenda ORDER BY E.Libelle');
                     $query4->setParameter(':Agenda', $unAgenda->getAgendas());
                     $allEvents[] = $query4->getResult();
                 }
@@ -101,7 +102,7 @@ class AccueilController extends AbstractController {
         else {
             //Récupération des evenements par agenda
             foreach ($allAgendas as $unAgenda) {
-                $query4 = $bdd->createQuery('SELECT E FROM App\Entity\Evenement E JOIN E.Agenda A WHERE A.id = :Agenda');
+                $query4 = $bdd->createQuery('SELECT E FROM App\Entity\Evenement E JOIN E.Agenda A WHERE A.id = :Agenda ORDER BY E.Libelle');
                 $query4->setParameter(':Agenda', $unAgenda->getAgendas());
                 $allEvents[] = $query4->getResult();
             }
@@ -112,9 +113,35 @@ class AccueilController extends AbstractController {
 //        dump($unAgenda);
 //        dump($allEvents);
 
-
         if (!empty($uneDate)) {
             $Date->majDate($uneDate);
+        }
+
+        if (($_POST['selectAffichage'] ?? 0) == 1) {
+            foreach ($Date->getDateRage() as $dateParcour) {
+                $tabGant['date'][] = $dateParcour->format('d');
+            }
+
+            foreach ($Date->getDateRage() as $dateParcour) {
+                foreach ($allEvents as $unAgenda) {
+                    foreach ($unAgenda as $unEvent) {
+                        if ($unEvent->getDateDebut()->format('Y-m-d') == $dateParcour->format('Y-m-d')) {
+                            $tabGant[$unEvent->getLibelle()][$dateParcour->format('Y-m-d')] = $unEvent;
+                        }
+                    }
+                }
+            }
+
+            foreach ($Date->getDateRage() as $dateParcour) {
+                foreach ($tabGant as $keyLigne => $uneLigne) {
+                    if ($keyLigne !== 'date') {
+                        if (!isset($uneLigne[$dateParcour->format('Y-m-d')])) {
+                            $tabGant[$keyLigne][$dateParcour->format('Y-m-d')] = null;
+                        }
+                        ksort($tabGant[$keyLigne]);
+                    }
+                }
+            }
         }
 
         return $this->render('accueil/index.html.twig', [
@@ -126,7 +153,9 @@ class AccueilController extends AbstractController {
                     'allAcces'       => $allAcces,
                     'allEvents'      => $allEvents,
                     'selectedAgenda' => $selectedAgenda,
-                    'myAcces'        => $myAcces
+                    'myAcces'        => $myAcces,
+                    'affichage'      => $_POST['selectAffichage'] ?? 0,
+                    'tabGantt'       => $tabGant
         ]);
     }
 
@@ -591,13 +620,13 @@ class AccueilController extends AbstractController {
         $query->setParameter(':Personne', $User);
         $Acces = $query->getResult();
 
-        $Notifs= $Acces[0]->getAgendas()->getEvenement();
+        $Notifs = $Acces[0]->getAgendas()->getEvenement();
         foreach ($Notifs as $uneNotif) {
             $jsonData = array(
-                'Libelle' => $uneNotif->getLibelle(),
+                'Libelle'   => $uneNotif->getLibelle(),
                 'DateDebut' => $uneNotif->getDateDebut()->format('d-m-Y H:i'),
-                'Note' => $uneNotif->getNote(),
-                'Lieu' => $uneNotif->getLieu()
+                'Note'      => $uneNotif->getNote(),
+                'Lieu'      => $uneNotif->getLieu()
             );
         }
         return new JsonResponse($jsonData);

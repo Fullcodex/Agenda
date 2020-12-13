@@ -36,9 +36,9 @@
                             <div class="input-group-prepend" >
                                 <label class="input-group-text" for="selectAffichage">Agendas</label>
                             </div>
-                            <select id="selectAffichage" class="custom-select">
-                                <option>Affichage Calendrier</option>
-                                <option>Affichage Gantt</option>
+                            <select id="selectAffichage" class="custom-select" name="selectAffichage" onchange="document.formfiltre.submit()">
+                                <option {{ affichage == 0 ? 'selected' }} value="0">Affichage Calendrier</option>
+                                <option {{ affichage == 1 ? 'selected' }} value="1">Affichage Gantt</option>
                             </select>
                         </div>
                     </div>
